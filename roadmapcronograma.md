@@ -46,8 +46,8 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Teste automatizado de contexto executado com sucesso (`./mvnw test -Dspring.profiles.active=dev`).
 
 ### 3.2 Em andamento (proxima entrega)
-- [ ] Camada de servicos de dominio para regras de transacao (entrada/saida e saldo nao negativo).
-- [ ] Primeiros endpoints REST de conta e transacoes.
+- [x] Camada de servicos de dominio para regras de transacao (entrada/saida e saldo nao negativo).
+- [x] Primeiros endpoints REST de transacoes.
 
 ## 4) Roadmap detalhado por fases
 
@@ -68,19 +68,20 @@ Objetivo: consolidar base tecnica e contrato minimo de dados.
 ## Fase 2 - Regras de negocio core
 Objetivo: implementar comportamento principal do produto.
 
-- [ ] Caso de uso: criar transacao `DEPOSIT`.
-- [ ] Caso de uso: criar transacao `WITHDRAW` com bloqueio de saldo negativo.
-- [ ] Calculo de saldo por historico de transacoes.
-- [ ] Consulta de extrato por periodo.
+- [x] Caso de uso: criar transacao `DEPOSIT`.
+- [x] Caso de uso: criar transacao `WITHDRAW` com bloqueio de saldo negativo.
+- [x] Calculo de saldo por historico de transacoes.
+- [x] Consulta de extrato por periodo.
 - [ ] Consulta de resumo mensal (por origem e por tipo).
-- [ ] Padronizacao de validacoes:
+- [x] Padronizacao de validacoes:
   - valores monetarios
   - datas
   - campos obrigatorios
-- [ ] Tratamento padrao de erros de negocio.
-- [ ] Testes automatizados obrigatorios:
+- [x] Tratamento padrao de erros de negocio.
+- [x] Testes automatizados da entrega 3.2:
   - unitarios da camada de servico
-  - integracao de fluxo completo de transacao
+  - testes de controller com MockMvc
+- [ ] Testes de integracao de fluxo completo de transacao (servico + persistencia + HTTP)
 - [ ] Cobertura alvo da fase: minimo 65% do dominio core.
 
 ## Fase 3 - API REST v1
@@ -89,13 +90,13 @@ Objetivo: entregar endpoints para consumo inicial do front e integracoes.
 - [ ] Endpoints de conta/resumo:
   - saldo atual
   - resumo mensal
-- [ ] Endpoints de transacoes:
+- [x] Endpoints de transacoes:
   - criar transacao
   - listar por periodo
 - [ ] Endpoints de metas (CRUD inicial).
 - [ ] Endpoints de regra de bonus (consulta/atualizacao).
 - [ ] Validacao de payload (Bean Validation + mensagens claras).
-- [ ] Padrao de resposta HTTP e contrato de erro.
+- [x] Padrao de resposta HTTP e contrato de erro.
 - [ ] Documentacao tecnica inicial da API (OpenAPI/Swagger).
 - [ ] Testes automatizados obrigatorios:
   - integracao de controllers
@@ -166,6 +167,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Implementar servico de transacoes com regra de saldo nao negativo.
-- [ ] Criar endpoint `POST /transactions` e `GET /transactions`.
-- [ ] Adicionar suite de testes de servico + integracao dos endpoints iniciais.
+- [ ] Implementar endpoint de conta para saldo atual e resumo mensal.
+- [ ] Iniciar CRUD de metas (criar/listar/atualizar/remover).
+- [ ] Adicionar testes de integracao de repositorio para consultas agregadas (saldo/resumo).
