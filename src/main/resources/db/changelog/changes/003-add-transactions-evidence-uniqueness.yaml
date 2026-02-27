@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-add-transactions-evidence-uniqueness
+      author: codex
+      changes:
+        - addUniqueConstraint:
+            tableName: transactions
+            columnNames: account_id,origin,evidence_reference
+            constraintName: uk_transactions_account_origin_evidence

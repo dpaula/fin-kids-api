@@ -2,8 +2,10 @@ package br.com.autevia.finkidsapi.service;
 
 import br.com.autevia.finkidsapi.domain.entity.Account;
 import br.com.autevia.finkidsapi.domain.entity.AccountTransaction;
+import br.com.autevia.finkidsapi.domain.enums.TransactionOrigin;
 import br.com.autevia.finkidsapi.domain.enums.TransactionType;
 import br.com.autevia.finkidsapi.domain.exception.BusinessRuleException;
+import br.com.autevia.finkidsapi.domain.exception.DuplicateTransactionException;
 import br.com.autevia.finkidsapi.domain.exception.ResourceNotFoundException;
 import br.com.autevia.finkidsapi.domain.exception.ValidationException;
 import br.com.autevia.finkidsapi.repository.AccountRepository;
@@ -15,6 +17,7 @@ import br.com.autevia.finkidsapi.service.dto.TransactionListResult;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,13 @@ public class TransactionService {
 
         Account account = findAccountOrThrow(command.accountId());
         BigDecimal currentBalance = getCurrentBalance(account.getId());
+        String normalizedEvidence = normalizeEvidenceReference(command.evidenceReference());
+
+        if (normalizedEvidence != null && isDuplicateEvidence(command.accountId(), command.origin(), normalizedEvidence)) {
+            throw new DuplicateTransactionException(
+                    "Transacao duplicada para a mesma evidencia informada."
+            );
+        }
 
         if (command.type() == TransactionType.WITHDRAW && currentBalance.compareTo(command.amount()) < 0) {
             throw new BusinessRuleException("Saldo insuficiente para realizar saque.");
@@ -51,11 +61,19 @@ public class TransactionService {
                 command.origin(),
                 command.amount(),
                 command.description().trim(),
-                emptyToNull(command.evidenceReference()),
+                normalizedEvidence,
                 command.occurredAt()
         );
 
-        AccountTransaction saved = accountTransactionRepository.save(transaction);
+        AccountTransaction saved;
+        try {
+            saved = accountTransactionRepository.save(transaction);
+        } catch (DataIntegrityViolationException ex) {
+            if (normalizedEvidence != null) {
+                throw new DuplicateTransactionException("Transacao duplicada para a mesma evidencia informada.");
+            }
+            throw ex;
+        }
         BigDecimal updatedBalance = applyAmount(currentBalance, command.type(), command.amount());
 
         return new CreateTransactionResult(saved.getId(), updatedBalance);
@@ -125,11 +143,19 @@ public class TransactionService {
                 : currentBalance.subtract(amount);
     }
 
-    private String emptyToNull(String value) {
+    private String normalizeEvidenceReference(String value) {
         if (value == null || value.isBlank()) {
             return null;
         }
         return value.trim();
+    }
+
+    private boolean isDuplicateEvidence(Long accountId, TransactionOrigin origin, String evidenceReference) {
+        return accountTransactionRepository.existsByAccount_IdAndOriginAndEvidenceReference(
+                accountId,
+                origin,
+                evidenceReference
+        );
     }
 
     private TransactionItemResult toItem(AccountTransaction transaction) {

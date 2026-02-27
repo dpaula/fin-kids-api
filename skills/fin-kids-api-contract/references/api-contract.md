@@ -48,6 +48,7 @@ Standard error body (handled by `ApiExceptionHandler` for domain errors):
 Mapped statuses:
 - `400 Bad Request`: validation errors (`MethodArgumentNotValidException`, `HandlerMethodValidationException`, `ConstraintViolationException`, `ValidationException`)
 - `401 Unauthorized`: missing/invalid automation token (`AutomationAuthenticationEntryPoint`)
+- `409 Conflict`: duplicated transaction evidence for same `accountId + origin + evidenceReference` (`DuplicateTransactionException`)
 - `404 Not Found`: missing resources (`ResourceNotFoundException`)
 - `422 Unprocessable Entity`: business rule conflict (`BusinessRuleException`)
 
@@ -96,9 +97,11 @@ Success response:
 Business behavior:
 - `WITHDRAW` is rejected when current balance is insufficient.
 - Balance is calculated from transaction history (`DEPOSIT` positive, `WITHDRAW` negative).
+- If `evidenceReference` is provided, request is treated as idempotent by `accountId + origin + evidenceReference`.
 
 Common errors:
 - `400` invalid payload or invalid field values
+- `409` duplicate evidence for the same `accountId + origin + evidenceReference`
 - `404` account not found
 - `422` insufficient balance on withdraw
 
@@ -174,6 +177,7 @@ Request fields:
 Business behavior:
 - `origin` is not accepted from payload; API always persists `WHATSAPP`.
 - Same balance and withdraw validation rules from core transaction service apply.
+- If the same `evidenceReference` is resent for the same account/origin, API returns conflict (idempotency guard).
 
 Success response:
 - Status: `201 Created`
@@ -188,6 +192,7 @@ Success response:
 Common errors:
 - `400` invalid payload
 - `401` token absent or invalid
+- `409` duplicate evidence for the same `accountId + WHATSAPP + evidenceReference`
 - `404` account not found
 - `422` insufficient balance on withdraw
 

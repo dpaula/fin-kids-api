@@ -103,6 +103,17 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - conta inexistente (`404`)
   - saldo insuficiente (`422`)
 
+### 3.10 Entrega concluida
+- [x] Idempotencia de transacoes por evidencia implementada no fluxo de automacao.
+- [x] Constraint de unicidade em banco adicionada via Liquibase para evitar duplicidade:
+  - `transactions(account_id, origin, evidence_reference)`
+- [x] Tratamento de duplicidade padronizado com `409 Conflict`.
+- [x] Documentacao OpenAPI atualizada com resposta `409` nos endpoints de criacao de transacao.
+- [x] Testes automatizados da entrega:
+  - unitario de servico para bloqueio de duplicidade
+  - controller test para mapeamento HTTP `409`
+  - integracao de automacao com tentativa duplicada de mesma evidencia
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -177,11 +188,11 @@ Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
 
 - [x] Endpoint de ingestao de transacao automatizada com origem `WHATSAPP`.
 - [x] Suporte a evidencia da transacao (id/hash/url interna).
-- [ ] Regras de idempotencia para evitar duplicidade.
-- [ ] Mensagens de retorno para integracao (sucesso/erro de negocio).
+- [x] Regras de idempotencia para evitar duplicidade.
+- [x] Mensagens de retorno para integracao (sucesso/erro de negocio).
 - [ ] Testes automatizados obrigatorios:
   - [x] integracao do endpoint de automacao
-  - cenarios de duplicidade e saldo insuficiente
+  - [x] cenarios de duplicidade e saldo insuficiente
 - [ ] Cobertura alvo da fase: minimo 75% nos fluxos de automacao.
 
 ## Fase 6 - Metas e bonus educacional (MVP expandido)

@@ -71,6 +71,36 @@ class AutomationTransactionIntegrationTest {
     }
 
     @Test
+    void shouldReturnConflictWhenEvidenceReferenceIsDuplicatedInAutomationFlow() throws Exception {
+        Account account = accountRepository.save(new Account("Theo", "BRL"));
+
+        String payload = """
+                {
+                  "accountId": %d,
+                  "type": "DEPOSIT",
+                  "amount": 90.00,
+                  "description": "Deposito lido do comprovante",
+                  "evidenceReference": "wa-dup-001"
+                }
+                """.formatted(account.getId());
+
+        mockMvc.perform(post("/api/v1/automation/transactions")
+                        .header(HttpHeaders.AUTHORIZATION, VALID_AUTHORIZATION)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/v1/automation/transactions")
+                        .header(HttpHeaders.AUTHORIZATION, VALID_AUTHORIZATION)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Transacao duplicada para a mesma evidencia informada."));
+
+        assertThat(listAccountTransactions(account.getId())).hasSize(1);
+    }
+
+    @Test
     void shouldRejectWhenAuthorizationHeaderIsMissing() throws Exception {
         Account account = accountRepository.save(new Account("Lia", "BRL"));
 

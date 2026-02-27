@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import br.com.autevia.finkidsapi.domain.enums.TransactionOrigin;
 import br.com.autevia.finkidsapi.domain.enums.TransactionType;
 import br.com.autevia.finkidsapi.domain.exception.BusinessRuleException;
+import br.com.autevia.finkidsapi.domain.exception.DuplicateTransactionException;
 import br.com.autevia.finkidsapi.service.TransactionService;
 import br.com.autevia.finkidsapi.service.dto.CreateTransactionResult;
 import br.com.autevia.finkidsapi.service.dto.TransactionItemResult;
@@ -80,6 +81,29 @@ class TransactionControllerTest {
                         .content(payload))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("Saldo insuficiente para realizar saque."));
+    }
+
+    @Test
+    void shouldReturnConflictWhenEvidenceReferenceIsDuplicated() throws Exception {
+        when(transactionService.createTransaction(any()))
+                .thenThrow(new DuplicateTransactionException("Transacao duplicada para a mesma evidencia informada."));
+
+        String payload = """
+                {
+                  "accountId": 1,
+                  "type": "DEPOSIT",
+                  "origin": "WHATSAPP",
+                  "amount": 80.00,
+                  "description": "Deposito via comprovante",
+                  "evidenceReference": "wa-media-001"
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/transactions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Transacao duplicada para a mesma evidencia informada."));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package br.com.autevia.finkidsapi.web;
 
 import br.com.autevia.finkidsapi.domain.exception.BusinessRuleException;
+import br.com.autevia.finkidsapi.domain.exception.DuplicateTransactionException;
 import br.com.autevia.finkidsapi.domain.exception.ResourceNotFoundException;
 import br.com.autevia.finkidsapi.domain.exception.ValidationException;
 import br.com.autevia.finkidsapi.web.error.ErrorResponse;
@@ -78,6 +79,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(BusinessRuleException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(DuplicateTransactionException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(DuplicateTransactionException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message, HttpServletRequest request) {

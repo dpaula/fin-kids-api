@@ -1,6 +1,7 @@
 package br.com.autevia.finkidsapi.repository;
 
 import br.com.autevia.finkidsapi.domain.entity.AccountTransaction;
+import br.com.autevia.finkidsapi.domain.enums.TransactionOrigin;
 import br.com.autevia.finkidsapi.repository.projection.TransactionOriginTotalProjection;
 import br.com.autevia.finkidsapi.repository.projection.TransactionTypeTotalProjection;
 import java.math.BigDecimal;
@@ -11,6 +12,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface AccountTransactionRepository extends JpaRepository<AccountTransaction, Long> {
+
+    boolean existsByAccount_IdAndOriginAndEvidenceReference(
+            Long accountId,
+            TransactionOrigin origin,
+            String evidenceReference
+    );
 
     List<AccountTransaction> findByAccountIdAndOccurredAtBetweenOrderByOccurredAtDesc(
             Long accountId,

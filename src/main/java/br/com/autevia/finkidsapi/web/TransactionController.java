@@ -51,6 +51,8 @@ public class TransactionController {
                     content = @Content(schema = @Schema(implementation = CreateTransactionResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload invalido",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Transacao duplicada para a mesma evidencia",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Conta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "422", description = "Regra de negocio violada",

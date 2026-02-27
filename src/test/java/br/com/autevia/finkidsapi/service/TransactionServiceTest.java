@@ -12,6 +12,7 @@ import br.com.autevia.finkidsapi.domain.entity.AccountTransaction;
 import br.com.autevia.finkidsapi.domain.enums.TransactionOrigin;
 import br.com.autevia.finkidsapi.domain.enums.TransactionType;
 import br.com.autevia.finkidsapi.domain.exception.BusinessRuleException;
+import br.com.autevia.finkidsapi.domain.exception.DuplicateTransactionException;
 import br.com.autevia.finkidsapi.domain.exception.ValidationException;
 import br.com.autevia.finkidsapi.repository.AccountRepository;
 import br.com.autevia.finkidsapi.repository.AccountTransactionRepository;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,6 +100,66 @@ class TransactionServiceTest {
                 .hasMessageContaining("Saldo insuficiente");
 
         verify(accountTransactionRepository, never()).save(any(AccountTransaction.class));
+    }
+
+    @Test
+    void shouldRejectDuplicateTransactionByEvidenceReference() {
+        Account account = new Account("Lucas", "BRL");
+        ReflectionTestUtils.setField(account, "id", 1L);
+
+        CreateTransactionCommand command = new CreateTransactionCommand(
+                1L,
+                TransactionType.DEPOSIT,
+                TransactionOrigin.WHATSAPP,
+                new BigDecimal("70.00"),
+                "Deposito lido",
+                "wa-media-001",
+                Instant.now()
+        );
+
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
+        when(accountTransactionRepository.calculateBalanceByAccountId(1L)).thenReturn(new BigDecimal("30.00"));
+        when(accountTransactionRepository.existsByAccount_IdAndOriginAndEvidenceReference(
+                1L,
+                TransactionOrigin.WHATSAPP,
+                "wa-media-001"
+        )).thenReturn(true);
+
+        assertThatThrownBy(() -> transactionService.createTransaction(command))
+                .isInstanceOf(DuplicateTransactionException.class)
+                .hasMessageContaining("Transacao duplicada");
+
+        verify(accountTransactionRepository, never()).save(any(AccountTransaction.class));
+    }
+
+    @Test
+    void shouldTranslateDatabaseUniqueViolationToDuplicateTransactionException() {
+        Account account = new Account("Lucas", "BRL");
+        ReflectionTestUtils.setField(account, "id", 1L);
+
+        CreateTransactionCommand command = new CreateTransactionCommand(
+                1L,
+                TransactionType.DEPOSIT,
+                TransactionOrigin.WHATSAPP,
+                new BigDecimal("70.00"),
+                "Deposito lido",
+                "wa-media-002",
+                Instant.now()
+        );
+
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
+        when(accountTransactionRepository.calculateBalanceByAccountId(1L)).thenReturn(new BigDecimal("30.00"));
+        when(accountTransactionRepository.existsByAccount_IdAndOriginAndEvidenceReference(
+                1L,
+                TransactionOrigin.WHATSAPP,
+                "wa-media-002"
+        )).thenReturn(false);
+        when(accountTransactionRepository.save(any(AccountTransaction.class)))
+                .thenThrow(new DataIntegrityViolationException("unique violation"));
+
+        assertThatThrownBy(() -> transactionService.createTransaction(command))
+                .isInstanceOf(DuplicateTransactionException.class)
+                .hasMessageContaining("Transacao duplicada");
     }
 
     @Test
