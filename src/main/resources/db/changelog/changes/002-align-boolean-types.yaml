@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-align-boolean-types
+      author: codex
+      changes:
+        - modifyDataType:
+            tableName: bonus_rules
+            columnName: active
+            newDataType: BIT(1)
+        - modifyDataType:
+            tableName: goals
+            columnName: active
+            newDataType: BIT(1)
