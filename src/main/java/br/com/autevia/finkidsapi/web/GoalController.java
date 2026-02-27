@@ -9,8 +9,11 @@ import br.com.autevia.finkidsapi.web.dto.goal.CreateGoalRequest;
 import br.com.autevia.finkidsapi.web.dto.goal.GoalListResponse;
 import br.com.autevia.finkidsapi.web.dto.goal.GoalResponse;
 import br.com.autevia.finkidsapi.web.dto.goal.UpdateGoalRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/goals")
+@Validated
 public class GoalController {
 
     private final GoalService goalService;
@@ -34,7 +38,7 @@ public class GoalController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GoalResponse create(@RequestBody CreateGoalRequest request) {
+    public GoalResponse create(@Valid @RequestBody CreateGoalRequest request) {
         GoalItemResult result = goalService.createGoal(
                 new CreateGoalCommand(request.accountId(), request.name(), request.targetAmount())
         );
@@ -42,7 +46,9 @@ public class GoalController {
     }
 
     @GetMapping
-    public GoalListResponse list(@RequestParam Long accountId) {
+    public GoalListResponse list(
+            @RequestParam @Positive(message = "accountId deve ser maior que zero.") Long accountId
+    ) {
         GoalListResult result = goalService.listGoals(accountId);
         List<GoalResponse> goals = result.goals().stream()
                 .map(this::toResponse)
@@ -52,7 +58,10 @@ public class GoalController {
     }
 
     @PutMapping("/{goalId}")
-    public GoalResponse update(@PathVariable Long goalId, @RequestBody UpdateGoalRequest request) {
+    public GoalResponse update(
+            @PathVariable @Positive(message = "goalId deve ser maior que zero.") Long goalId,
+            @Valid @RequestBody UpdateGoalRequest request
+    ) {
         GoalItemResult result = goalService.updateGoal(
                 goalId,
                 new UpdateGoalCommand(request.accountId(), request.name(), request.targetAmount())
@@ -62,7 +71,10 @@ public class GoalController {
 
     @DeleteMapping("/{goalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long goalId, @RequestParam Long accountId) {
+    public void delete(
+            @PathVariable @Positive(message = "goalId deve ser maior que zero.") Long goalId,
+            @RequestParam @Positive(message = "accountId deve ser maior que zero.") Long accountId
+    ) {
         goalService.deleteGoal(goalId, accountId);
     }
 

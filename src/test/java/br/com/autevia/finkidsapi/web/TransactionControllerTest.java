@@ -107,4 +107,23 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.transactions[0].transactionId").value(77))
                 .andExpect(jsonPath("$.transactions[0].type").value("DEPOSIT"));
     }
+
+    @Test
+    void shouldReturnBadRequestWhenCreatePayloadIsInvalid() throws Exception {
+        String payload = """
+                {
+                  "accountId": 1,
+                  "type": "DEPOSIT",
+                  "origin": "MANUAL",
+                  "amount": 0,
+                  "description": ""
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/transactions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
 }

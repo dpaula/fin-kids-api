@@ -119,6 +119,23 @@ class GoalControllerTest {
                 .andExpect(jsonPath("$.message").value("Meta nao encontrada para id=99"));
     }
 
+    @Test
+    void shouldReturnBadRequestWhenCreateGoalPayloadIsInvalid() throws Exception {
+        String payload = """
+                {
+                  "accountId": 1,
+                  "name": "",
+                  "targetAmount": 0
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/goals")
+                        .contentType("application/json")
+                        .content(payload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
     private GoalItemResult goalResult(Long goalId, Long accountId, String name, String targetAmount, boolean active) {
         return new GoalItemResult(
                 goalId,

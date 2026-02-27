@@ -35,7 +35,7 @@ Standard error body (handled by `ApiExceptionHandler` for domain errors):
 ```
 
 Mapped statuses:
-- `400 Bad Request`: validation errors (`ValidationException`)
+- `400 Bad Request`: validation errors (`MethodArgumentNotValidException`, `HandlerMethodValidationException`, `ConstraintViolationException`, `ValidationException`)
 - `404 Not Found`: missing resources (`ResourceNotFoundException`)
 - `422 Unprocessable Entity`: business rule conflict (`BusinessRuleException`)
 
@@ -67,7 +67,7 @@ Request fields:
 - `type` (enum `TransactionType`, required)
 - `origin` (enum `TransactionOrigin`, required)
 - `amount` (decimal, required, `> 0`)
-- `description` (string, required, non-empty)
+- `description` (string, required, non-empty, max 255 chars)
 - `evidenceReference` (string, optional)
 - `occurredAt` (timestamp, optional; if null server sets current timestamp)
 
@@ -222,6 +222,7 @@ Request body:
 Request fields:
 - `accountId` (number, required, `> 0`)
 - `name` (string, required, non-empty)
+- `name` max length: 120 chars
 - `targetAmount` (decimal, required, `> 0`)
 
 Success response:
@@ -296,6 +297,7 @@ Request body:
 Request fields:
 - `accountId` (required, number, `> 0`)
 - `name` (required, non-empty)
+- `name` max length: 120 chars
 - `targetAmount` (required, `> 0`)
 
 Success response:

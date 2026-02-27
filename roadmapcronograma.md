@@ -57,6 +57,12 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] CRUD inicial de metas (criar/listar/atualizar/remover com exclusao logica).
 - [x] Testes automatizados de metas (servico + controller).
 
+### 3.5 Entrega concluida
+- [x] Validacao de payload e parametros com Bean Validation nos controllers/DTOs.
+- [x] Tratamento padronizado de erros de validacao HTTP 400 no `ApiExceptionHandler`.
+- [x] Cobertura automatizada com JaCoCo no build (`verify`) com regra minima aplicada.
+- [x] Testes de repositorio para consultas agregadas de saldo/resumo mensal.
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -69,9 +75,9 @@ Objetivo: consolidar base tecnica e contrato minimo de dados.
   - indices para consultas de extrato e resumo
 - [ ] Seeds opcionais para ambiente de desenvolvimento.
 - [ ] Testes automatizados da camada de persistencia:
-  - testes de repository
+  - [x] testes de repository
   - testes de migration (subida limpa de schema)
-- [ ] Cobertura alvo da fase: minimo 50% na camada de dominio/persistencia.
+- [x] Cobertura alvo da fase: minimo 50% na camada de dominio/persistencia.
 
 ## Fase 2 - Regras de negocio core
 Objetivo: implementar comportamento principal do produto.
@@ -90,7 +96,7 @@ Objetivo: implementar comportamento principal do produto.
   - unitarios da camada de servico
   - testes de controller com MockMvc
 - [ ] Testes de integracao de fluxo completo de transacao (servico + persistencia + HTTP)
-- [ ] Cobertura alvo da fase: minimo 65% do dominio core.
+- [x] Cobertura alvo da fase: minimo 65% do dominio core.
 
 ## Fase 3 - API REST v1
 Objetivo: entregar endpoints para consumo inicial do front e integracoes.
@@ -103,13 +109,13 @@ Objetivo: entregar endpoints para consumo inicial do front e integracoes.
   - listar por periodo
 - [x] Endpoints de metas (CRUD inicial).
 - [ ] Endpoints de regra de bonus (consulta/atualizacao).
-- [ ] Validacao de payload (Bean Validation + mensagens claras).
+- [x] Validacao de payload (Bean Validation + mensagens claras).
 - [x] Padrao de resposta HTTP e contrato de erro.
 - [ ] Documentacao tecnica inicial da API (OpenAPI/Swagger).
 - [ ] Testes automatizados obrigatorios:
   - integracao de controllers
   - testes de contrato dos endpoints principais
-- [ ] Cobertura alvo da fase: minimo 70% em servicos e controllers core.
+- [x] Cobertura alvo da fase: minimo 70% em servicos e controllers core.
 
 ## Fase 4 - Seguranca e autorizacao
 Objetivo: proteger API por perfil de usuario e integracao automatizada.
@@ -176,5 +182,5 @@ Um item so pode ser marcado como concluido quando:
 
 ## 6) Proxima entrega recomendada (curto prazo)
 - [ ] Iniciar endpoint de regras de bonus (consulta e atualizacao).
-- [ ] Consolidar validacao de payload com Bean Validation nas requests de controllers.
-- [ ] Adicionar testes de integracao de repositorio para consultas agregadas (saldo/resumo).
+- [ ] Implementar testes de integracao end-to-end do fluxo de transacao (`POST /transactions` + persistencia + regra de saldo).
+- [ ] Publicar documentacao OpenAPI/Swagger da API v1 para consumo do frontend/n8n.

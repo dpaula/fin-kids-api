@@ -9,9 +9,12 @@ import br.com.autevia.finkidsapi.web.dto.CreateTransactionRequest;
 import br.com.autevia.finkidsapi.web.dto.CreateTransactionResponse;
 import br.com.autevia.finkidsapi.web.dto.TransactionItemResponse;
 import br.com.autevia.finkidsapi.web.dto.TransactionListResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
+@Validated
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -32,7 +36,7 @@ public class TransactionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateTransactionResponse create(@RequestBody CreateTransactionRequest request) {
+    public CreateTransactionResponse create(@Valid @RequestBody CreateTransactionRequest request) {
         CreateTransactionResult result = transactionService.createTransaction(
                 new CreateTransactionCommand(
                         request.accountId(),
@@ -50,7 +54,7 @@ public class TransactionController {
 
     @GetMapping
     public TransactionListResponse list(
-            @RequestParam Long accountId,
+            @RequestParam @Positive(message = "accountId deve ser maior que zero.") Long accountId,
             @RequestParam Instant start,
             @RequestParam Instant end
     ) {
