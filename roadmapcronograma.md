@@ -82,6 +82,14 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - payload invalido (`400`)
   - conta inexistente (`404`)
 
+### 3.8 Entrega concluida
+- [x] Publicacao da documentacao tecnica OpenAPI/Swagger da API v1.
+- [x] Configuracao central do OpenAPI com metadados e schema de erro padrao.
+- [x] Anotacao dos controllers e DTOs principais para contrato documentado.
+- [x] Teste de integracao da documentacao:
+  - `GET /v3/api-docs`
+  - `GET /swagger-ui/index.html`
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -130,7 +138,7 @@ Objetivo: entregar endpoints para consumo inicial do front e integracoes.
 - [x] Endpoints de regra de bonus (consulta/atualizacao).
 - [x] Validacao de payload (Bean Validation + mensagens claras).
 - [x] Padrao de resposta HTTP e contrato de erro.
-- [ ] Documentacao tecnica inicial da API (OpenAPI/Swagger).
+- [x] Documentacao tecnica inicial da API (OpenAPI/Swagger).
 - [ ] Testes automatizados obrigatorios:
   - integracao de controllers
   - testes de contrato dos endpoints principais
@@ -200,5 +208,5 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Publicar documentacao OpenAPI/Swagger da API v1 para consumo do frontend/n8n.
 - [ ] Preparar endpoint seguro para automacao (token dedicado para n8n) como base da Fase 4/Fase 5.
+- [ ] Iniciar estrutura de autenticacao/autorizacao (JWT Resource Server + roles `CRIANCA` e `PAI/MAE`).

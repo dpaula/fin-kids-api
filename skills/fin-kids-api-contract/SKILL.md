@@ -13,7 +13,8 @@ Keep the API contract for this repository accurate and ready for front-end consu
 2. If implementation changed, inspect controllers, DTOs, services, and exception handlers in `src/main/java`.
 3. Update `references/api-contract.md` to match current behavior.
 4. Keep examples in ISO-8601 UTC and enum values exactly as implemented.
-5. Report breaking changes explicitly (renamed fields, removed params, status changes).
+5. Confirm OpenAPI output in `/v3/api-docs` remains aligned with the written contract.
+6. Report breaking changes explicitly (renamed fields, removed params, status changes).
 
 ## Contract Rules
 

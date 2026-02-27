@@ -8,6 +8,8 @@ Updated for the current codebase in this repository.
 - Content type: `application/json`
 - Time format: ISO-8601 UTC (`Instant`), example: `2026-02-27T12:00:00Z`
 - Monetary fields: decimal values with 2 fraction digits (domain allows `BigDecimal`)
+- OpenAPI spec JSON: `/v3/api-docs`
+- Swagger UI: `/swagger-ui/index.html`
 
 ## 2) Enums
 
