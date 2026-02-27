@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fin Kids API Contract"
+  short_description: "Contrato de endpoints da Fin Kids API"
+  default_prompt: "Use $fin-kids-api-contract to document and sync API endpoint contracts for frontend integration."
