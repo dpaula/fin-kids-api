@@ -8,6 +8,7 @@ Updated for the current codebase in this repository.
 - Content type: `application/json`
 - Time format: ISO-8601 UTC (`Instant`), example: `2026-02-27T12:00:00Z`
 - Monetary fields: decimal values with 2 fraction digits (domain allows `BigDecimal`)
+- Automation auth: `Authorization: Bearer <token>` required for `/api/v1/automation/**`
 - OpenAPI spec JSON: `/v3/api-docs`
 - Swagger UI: `/swagger-ui/index.html`
 
@@ -46,6 +47,7 @@ Standard error body (handled by `ApiExceptionHandler` for domain errors):
 
 Mapped statuses:
 - `400 Bad Request`: validation errors (`MethodArgumentNotValidException`, `HandlerMethodValidationException`, `ConstraintViolationException`, `ValidationException`)
+- `401 Unauthorized`: missing/invalid automation token (`AutomationAuthenticationEntryPoint`)
 - `404 Not Found`: missing resources (`ResourceNotFoundException`)
 - `422 Unprocessable Entity`: business rule conflict (`BusinessRuleException`)
 
@@ -140,7 +142,58 @@ Common errors:
 
 ---
 
-## 5) Account Summary API
+## 5) Automation Transactions API
+
+### 5.1 Create transaction via automation (n8n/WhatsApp)
+
+- Method: `POST`
+- Path: `/api/v1/automation/transactions`
+- Security: `Authorization: Bearer <token>` (`AutomationBearerAuth`)
+
+Request body:
+
+```json
+{
+  "accountId": 1,
+  "type": "DEPOSIT",
+  "amount": 100.00,
+  "description": "Deposito identificado via comprovante",
+  "evidenceReference": "wa-media-001",
+  "occurredAt": "2026-02-27T12:00:00Z"
+}
+```
+
+Request fields:
+- `accountId` (number, required, `> 0`)
+- `type` (enum `TransactionType`, required)
+- `amount` (decimal, required, `> 0`)
+- `description` (string, required, non-empty, max 255 chars)
+- `evidenceReference` (string, optional)
+- `occurredAt` (timestamp, optional; if null server sets current timestamp)
+
+Business behavior:
+- `origin` is not accepted from payload; API always persists `WHATSAPP`.
+- Same balance and withdraw validation rules from core transaction service apply.
+
+Success response:
+- Status: `201 Created`
+
+```json
+{
+  "transactionId": 10,
+  "updatedBalance": 150.00
+}
+```
+
+Common errors:
+- `400` invalid payload
+- `401` token absent or invalid
+- `404` account not found
+- `422` insufficient balance on withdraw
+
+---
+
+## 6) Account Summary API
 
 ### 5.1 Get current balance
 
@@ -212,7 +265,7 @@ Common errors:
 
 ---
 
-## 6) Goals API
+## 7) Goals API
 
 ### 6.1 Create goal
 
@@ -341,7 +394,7 @@ Common errors:
 
 ---
 
-## 7) Bonus Rule API
+## 8) Bonus Rule API
 
 ### 7.1 Get bonus rule by account
 
@@ -410,7 +463,7 @@ Common errors:
 
 ---
 
-## 8) Maintenance Checklist
+## 9) Maintenance Checklist
 
 When adding or changing any controller/endpoint:
 

@@ -90,6 +90,19 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - `GET /v3/api-docs`
   - `GET /swagger-ui/index.html`
 
+### 3.9 Entrega concluida
+- [x] Endpoint seguro de automacao implementado:
+  - `POST /api/v1/automation/transactions`
+- [x] Autenticacao por token dedicado para chamadas n8n/WhatsApp (`Authorization: Bearer <token>`).
+- [x] Integracao com regras core de transacao, forçando origem `WHATSAPP` no fluxo de automacao.
+- [x] OpenAPI atualizado com `securityScheme` para automacao (`AutomationBearerAuth`).
+- [x] Testes de integracao da automacao cobrindo:
+  - sucesso com token valido (`201`)
+  - token ausente/invalido (`401`)
+  - payload invalido (`400`)
+  - conta inexistente (`404`)
+  - saldo insuficiente (`422`)
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -151,23 +164,23 @@ Objetivo: proteger API por perfil de usuario e integracao automatizada.
 - [ ] Autorizacao por perfil:
   - `CRIANCA` (somente leitura permitida)
   - `PAI/MAE` (leitura e escrita administrativa)
-- [ ] Endpoint seguro para automacao (n8n) com credencial dedicada.
+- [x] Endpoint seguro para automacao (n8n) com credencial dedicada.
 - [ ] Auditoria de alteracoes sensiveis.
 - [ ] Testes automatizados obrigatorios:
   - testes de autorizacao por role
   - testes de acesso negado
-  - testes de endpoint de automacao
+  - [x] testes de endpoint de automacao
 - [ ] Cobertura alvo da fase: minimo 75% em regras de seguranca e acesso.
 
 ## Fase 5 - Integração de automacao (contrato API)
 Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
 
-- [ ] Endpoint de ingestao de transacao automatizada com origem `WHATSAPP`.
-- [ ] Suporte a evidencia da transacao (id/hash/url interna).
+- [x] Endpoint de ingestao de transacao automatizada com origem `WHATSAPP`.
+- [x] Suporte a evidencia da transacao (id/hash/url interna).
 - [ ] Regras de idempotencia para evitar duplicidade.
 - [ ] Mensagens de retorno para integracao (sucesso/erro de negocio).
 - [ ] Testes automatizados obrigatorios:
-  - integracao do endpoint de automacao
+  - [x] integracao do endpoint de automacao
   - cenarios de duplicidade e saldo insuficiente
 - [ ] Cobertura alvo da fase: minimo 75% nos fluxos de automacao.
 
@@ -208,5 +221,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Preparar endpoint seguro para automacao (token dedicado para n8n) como base da Fase 4/Fase 5.
-- [ ] Iniciar estrutura de autenticacao/autorizacao (JWT Resource Server + roles `CRIANCA` e `PAI/MAE`).
+- [ ] Iniciar estrutura de autenticacao/autorizacao por usuarios com JWT Resource Server.
+- [ ] Introduzir autorizacao por role (`CRIANCA`, `PAI/MAE`) nos endpoints existentes.
+- [ ] Definir estrategia de transicao para autenticar WebApp e manter token dedicado para n8n.

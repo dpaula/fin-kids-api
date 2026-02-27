@@ -1,8 +1,10 @@
 package br.com.autevia.finkidsapi.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,6 +14,14 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI finKidsOpenApi() {
         return new OpenAPI()
+                .components(new Components().addSecuritySchemes(
+                        "AutomationBearerAuth",
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("API Token")
+                                .description("Token dedicado para chamadas de automacao (n8n/WhatsApp).")
+                ))
                 .info(new Info()
                         .title("Fin Kids API")
                         .version("v1")
