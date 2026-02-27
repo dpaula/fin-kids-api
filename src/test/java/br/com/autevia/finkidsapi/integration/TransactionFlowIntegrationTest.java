@@ -2,13 +2,19 @@ package br.com.autevia.finkidsapi.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.autevia.finkidsapi.domain.entity.Account;
+import br.com.autevia.finkidsapi.domain.entity.AccountUser;
 import br.com.autevia.finkidsapi.domain.entity.AccountTransaction;
+import br.com.autevia.finkidsapi.domain.entity.AppUser;
+import br.com.autevia.finkidsapi.domain.enums.UserRole;
+import br.com.autevia.finkidsapi.repository.AccountUserRepository;
 import br.com.autevia.finkidsapi.repository.AccountRepository;
 import br.com.autevia.finkidsapi.repository.AccountTransactionRepository;
+import br.com.autevia.finkidsapi.repository.AppUserRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -39,9 +45,17 @@ class TransactionFlowIntegrationTest {
     @Autowired
     private AccountTransactionRepository accountTransactionRepository;
 
+    @Autowired
+    private AppUserRepository appUserRepository;
+
+    @Autowired
+    private AccountUserRepository accountUserRepository;
+
     @Test
     void shouldCreateDepositAndPersistTransaction() throws Exception {
         Account account = accountRepository.save(new Account("Lucas", "BRL"));
+        String parentEmail = "parent.deposit@test.com";
+        linkAccountUser(account, parentEmail, UserRole.PARENT);
 
         String payload = """
                 {
@@ -55,6 +69,7 @@ class TransactionFlowIntegrationTest {
                 """.formatted(account.getId());
 
         mockMvc.perform(post("/api/v1/transactions")
+                        .with(jwt().jwt(jwt -> jwt.claim("email", parentEmail)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isCreated())
@@ -72,8 +87,11 @@ class TransactionFlowIntegrationTest {
     @Test
     void shouldCreateWithdrawWhenBalanceIsSufficient() throws Exception {
         Account account = accountRepository.save(new Account("Ana", "BRL"));
+        String parentEmail = "parent.withdraw@test.com";
+        linkAccountUser(account, parentEmail, UserRole.PARENT);
 
         mockMvc.perform(post("/api/v1/transactions")
+                        .with(jwt().jwt(jwt -> jwt.claim("email", parentEmail)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -88,6 +106,7 @@ class TransactionFlowIntegrationTest {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/v1/transactions")
+                        .with(jwt().jwt(jwt -> jwt.claim("email", parentEmail)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -111,8 +130,11 @@ class TransactionFlowIntegrationTest {
     @Test
     void shouldRejectWithdrawWhenBalanceIsInsufficientAndNotPersistTransaction() throws Exception {
         Account account = accountRepository.save(new Account("Bia", "BRL"));
+        String parentEmail = "parent.insufficient@test.com";
+        linkAccountUser(account, parentEmail, UserRole.PARENT);
 
         mockMvc.perform(post("/api/v1/transactions")
+                        .with(jwt().jwt(jwt -> jwt.claim("email", parentEmail)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -135,8 +157,11 @@ class TransactionFlowIntegrationTest {
     @Test
     void shouldReturnBadRequestForInvalidPayload() throws Exception {
         Account account = accountRepository.save(new Account("Nina", "BRL"));
+        String parentEmail = "parent.badrequest@test.com";
+        linkAccountUser(account, parentEmail, UserRole.PARENT);
 
         mockMvc.perform(post("/api/v1/transactions")
+                        .with(jwt().jwt(jwt -> jwt.claim("email", parentEmail)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -154,11 +179,15 @@ class TransactionFlowIntegrationTest {
     }
 
     @Test
-    void shouldReturnNotFoundWhenAccountDoesNotExist() throws Exception {
+    void shouldReturnForbiddenWhenAccountIsNotLinkedToAuthenticatedUser() throws Exception {
+        String parentEmail = "parent.notfound@test.com";
+        appUserRepository.save(new AppUser("Parent", parentEmail, "google-parent-notfound", UserRole.PARENT));
+
         mockMvc.perform(post("/api/v1/transactions")
+                        .with(jwt().jwt(jwt -> jwt.claim("email", parentEmail)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {
+                {
                                   "accountId": 999999999,
                                   "type": "DEPOSIT",
                                   "origin": "MANUAL",
@@ -166,8 +195,15 @@ class TransactionFlowIntegrationTest {
                                   "description": "Mesada"
                                 }
                                 """))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Conta nao encontrada para id=999999999"));
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Acesso negado para este recurso."));
+    }
+
+    private void linkAccountUser(Account account, String email, UserRole role) {
+        AppUser user = appUserRepository.save(
+                new AppUser("User " + role.name(), email, "google-" + email, role)
+        );
+        accountUserRepository.save(new AccountUser(account, user, role));
     }
 
     private List<AccountTransaction> listAccountTransactions(Long accountId) {

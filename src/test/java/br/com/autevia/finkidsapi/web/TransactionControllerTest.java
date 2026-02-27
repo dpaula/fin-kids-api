@@ -1,6 +1,7 @@
 package br.com.autevia.finkidsapi.web;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,6 +12,7 @@ import br.com.autevia.finkidsapi.domain.enums.TransactionOrigin;
 import br.com.autevia.finkidsapi.domain.enums.TransactionType;
 import br.com.autevia.finkidsapi.domain.exception.BusinessRuleException;
 import br.com.autevia.finkidsapi.domain.exception.DuplicateTransactionException;
+import br.com.autevia.finkidsapi.security.AccountAuthorizationService;
 import br.com.autevia.finkidsapi.service.TransactionService;
 import br.com.autevia.finkidsapi.service.dto.CreateTransactionResult;
 import br.com.autevia.finkidsapi.service.dto.TransactionItemResult;
@@ -18,15 +20,20 @@ import br.com.autevia.finkidsapi.service.dto.TransactionListResult;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.servlet.OAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(TransactionController.class)
+@WebMvcTest(
+        value = TransactionController.class,
+        excludeAutoConfiguration = OAuth2ResourceServerAutoConfiguration.class
+)
 @Import(ApiExceptionHandler.class)
 class TransactionControllerTest {
 
@@ -35,6 +42,15 @@ class TransactionControllerTest {
 
     @MockitoBean
     private TransactionService transactionService;
+
+    @MockitoBean
+    private AccountAuthorizationService accountAuthorizationService;
+
+    @BeforeEach
+    void setupAuthorization() {
+        when(accountAuthorizationService.canRead(anyLong())).thenReturn(true);
+        when(accountAuthorizationService.canWrite(anyLong())).thenReturn(true);
+    }
 
     @Test
     void shouldCreateTransaction() throws Exception {

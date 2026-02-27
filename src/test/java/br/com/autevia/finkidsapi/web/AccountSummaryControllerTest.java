@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import br.com.autevia.finkidsapi.domain.enums.TransactionOrigin;
 import br.com.autevia.finkidsapi.domain.enums.TransactionType;
 import br.com.autevia.finkidsapi.domain.exception.ResourceNotFoundException;
+import br.com.autevia.finkidsapi.security.AccountAuthorizationService;
 import br.com.autevia.finkidsapi.service.AccountSummaryService;
 import br.com.autevia.finkidsapi.service.dto.account.AccountBalanceResult;
 import br.com.autevia.finkidsapi.service.dto.account.MonthlySummaryByOriginResult;
@@ -18,14 +19,19 @@ import br.com.autevia.finkidsapi.service.dto.account.MonthlySummaryResult;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.servlet.OAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AccountSummaryController.class)
+@WebMvcTest(
+        value = AccountSummaryController.class,
+        excludeAutoConfiguration = OAuth2ResourceServerAutoConfiguration.class
+)
 @Import(ApiExceptionHandler.class)
 class AccountSummaryControllerTest {
 
@@ -34,6 +40,15 @@ class AccountSummaryControllerTest {
 
     @MockitoBean
     private AccountSummaryService accountSummaryService;
+
+    @MockitoBean
+    private AccountAuthorizationService accountAuthorizationService;
+
+    @BeforeEach
+    void setupAuthorization() {
+        when(accountAuthorizationService.canRead(anyLong())).thenReturn(true);
+        when(accountAuthorizationService.canWrite(anyLong())).thenReturn(true);
+    }
 
     @Test
     void shouldReturnAccountBalance() throws Exception {

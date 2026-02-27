@@ -21,6 +21,13 @@ public class OpenApiConfig {
                                 .scheme("bearer")
                                 .bearerFormat("API Token")
                                 .description("Token dedicado para chamadas de automacao (n8n/WhatsApp).")
+                ).addSecuritySchemes(
+                        "UserBearerAuth",
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .description("JWT de usuario autenticado no fluxo Google OAuth do WebApp.")
                 ))
                 .info(new Info()
                         .title("Fin Kids API")

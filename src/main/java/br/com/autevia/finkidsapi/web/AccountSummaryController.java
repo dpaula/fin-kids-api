@@ -16,11 +16,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/accounts")
 @Validated
+@SecurityRequirement(name = "UserBearerAuth")
 @Tag(name = "Accounts", description = "Consultas de saldo atual e consolidacao mensal da conta.")
 public class AccountSummaryController {
 
@@ -50,6 +53,7 @@ public class AccountSummaryController {
             @ApiResponse(responseCode = "404", description = "Conta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canRead(#accountId)")
     public AccountBalanceResponse getBalance(
             @Parameter(description = "Id da conta da crianca", example = "1")
             @PathVariable @Positive(message = "accountId deve ser maior que zero.") Long accountId
@@ -68,6 +72,7 @@ public class AccountSummaryController {
             @ApiResponse(responseCode = "404", description = "Conta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canRead(#accountId)")
     public MonthlySummaryResponse getMonthlySummary(
             @Parameter(description = "Id da conta da crianca", example = "1")
             @PathVariable @Positive(message = "accountId deve ser maior que zero.") Long accountId,

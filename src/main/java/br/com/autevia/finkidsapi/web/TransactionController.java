@@ -16,11 +16,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/transactions")
 @Validated
+@SecurityRequirement(name = "UserBearerAuth")
 @Tag(name = "Transactions", description = "Operacoes de criacao e consulta de transacoes financeiras da conta.")
 public class TransactionController {
 
@@ -58,6 +61,7 @@ public class TransactionController {
             @ApiResponse(responseCode = "422", description = "Regra de negocio violada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canWrite(#request.accountId())")
     public CreateTransactionResponse create(@Valid @RequestBody CreateTransactionRequest request) {
         CreateTransactionResult result = transactionService.createTransaction(
                 new CreateTransactionCommand(
@@ -84,6 +88,7 @@ public class TransactionController {
             @ApiResponse(responseCode = "404", description = "Conta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canRead(#accountId)")
     public TransactionListResponse list(
             @Parameter(description = "Id da conta da crianca", example = "1")
             @RequestParam @Positive(message = "accountId deve ser maior que zero.") Long accountId,

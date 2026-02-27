@@ -16,11 +16,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/goals")
 @Validated
+@SecurityRequirement(name = "UserBearerAuth")
 @Tag(name = "Goals", description = "Gestao de metas de poupanca da conta da crianca.")
 public class GoalController {
 
@@ -56,6 +59,7 @@ public class GoalController {
             @ApiResponse(responseCode = "404", description = "Conta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canWrite(#request.accountId())")
     public GoalResponse create(@Valid @RequestBody CreateGoalRequest request) {
         GoalItemResult result = goalService.createGoal(
                 new CreateGoalCommand(request.accountId(), request.name(), request.targetAmount())
@@ -73,6 +77,7 @@ public class GoalController {
             @ApiResponse(responseCode = "404", description = "Conta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canRead(#accountId)")
     public GoalListResponse list(
             @Parameter(description = "Id da conta da crianca", example = "1")
             @RequestParam @Positive(message = "accountId deve ser maior que zero.") Long accountId
@@ -95,6 +100,7 @@ public class GoalController {
             @ApiResponse(responseCode = "404", description = "Conta ou meta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canWrite(#request.accountId())")
     public GoalResponse update(
             @Parameter(description = "Id da meta", example = "11")
             @PathVariable @Positive(message = "goalId deve ser maior que zero.") Long goalId,
@@ -117,6 +123,7 @@ public class GoalController {
             @ApiResponse(responseCode = "404", description = "Conta ou meta nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("@accountAuthorization.canWrite(#accountId)")
     public void delete(
             @Parameter(description = "Id da meta", example = "11")
             @PathVariable @Positive(message = "goalId deve ser maior que zero.") Long goalId,

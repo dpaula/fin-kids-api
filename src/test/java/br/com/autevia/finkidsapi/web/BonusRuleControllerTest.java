@@ -1,6 +1,7 @@
 package br.com.autevia.finkidsapi.web;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -10,21 +11,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import br.com.autevia.finkidsapi.domain.enums.BonusBaseType;
 import br.com.autevia.finkidsapi.domain.enums.BonusConditionType;
 import br.com.autevia.finkidsapi.domain.exception.ResourceNotFoundException;
+import br.com.autevia.finkidsapi.security.AccountAuthorizationService;
 import br.com.autevia.finkidsapi.service.BonusRuleService;
 import br.com.autevia.finkidsapi.service.dto.bonus.BonusRuleResult;
 import jakarta.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.servlet.OAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(BonusRuleController.class)
+@WebMvcTest(
+        value = BonusRuleController.class,
+        excludeAutoConfiguration = OAuth2ResourceServerAutoConfiguration.class
+)
 @Import(ApiExceptionHandler.class)
 class BonusRuleControllerTest {
 
@@ -33,6 +40,15 @@ class BonusRuleControllerTest {
 
     @MockitoBean
     private BonusRuleService bonusRuleService;
+
+    @MockitoBean
+    private AccountAuthorizationService accountAuthorizationService;
+
+    @BeforeEach
+    void setupAuthorization() {
+        when(accountAuthorizationService.canRead(anyLong())).thenReturn(true);
+        when(accountAuthorizationService.canWrite(anyLong())).thenReturn(true);
+    }
 
     @Test
     void shouldGetBonusRule() throws Exception {

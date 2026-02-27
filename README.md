@@ -121,6 +121,14 @@ Objetivo deste modulo:
 - implementar regras de negocio
 - expor endpoints para WebApp e n8n
 
+### Autenticacao e autorizacao (MVP tecnico)
+- WebApp autentica com Google e envia JWT no header `Authorization: Bearer <token>`.
+- API valida JWT como Resource Server (issuer configuravel por `JWT_ISSUER_URI`, default Google).
+- Endpoint de automacao usa credencial dedicada e separada (`N8N_API_TOKEN`).
+- Autorizacao e por vinculo de conta (`account_users`):
+  - `CHILD`: leitura
+  - `PARENT`: leitura e escrita
+
 ## 5) Endpoints essenciais (primeira versao)
 
 ### Conta / Resumo

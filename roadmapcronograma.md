@@ -114,6 +114,25 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - controller test para mapeamento HTTP `409`
   - integracao de automacao com tentativa duplicada de mesma evidencia
 
+### 3.11 Entrega concluida
+- [x] Estrutura de autenticacao de usuario via JWT (OAuth2 Resource Server) implementada.
+- [x] Compatibilidade com login Google do WebApp considerada no contrato tecnico:
+  - API validando JWT por `issuer-uri` configuravel (`JWT_ISSUER_URI`)
+  - principal de usuario mapeado por claim `email`
+- [x] Cadeias de seguranca separadas para evitar conflito entre canais:
+  - `/api/v1/automation/**` com token dedicado n8n
+  - `/api/v1/**` (demais endpoints) com JWT de usuario
+- [x] Autorizacao por perfil e por conta aplicada usando vinculo `account_users.profile_role`:
+  - `CHILD`: leitura
+  - `PARENT`: leitura e escrita
+- [x] Endpoints core protegidos com regras de acesso por `accountId` (`@PreAuthorize`).
+- [x] OpenAPI atualizado com esquema de seguranca de usuario (`UserBearerAuth`).
+- [x] Testes automatizados da entrega:
+  - cenarios `401` (sem JWT)
+  - cenarios `403` (role sem permissao de escrita)
+  - cenarios de leitura permitida para crianca
+  - regressao dos fluxos existentes com autenticacao valida
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -171,13 +190,13 @@ Objetivo: entregar endpoints para consumo inicial do front e integracoes.
 ## Fase 4 - Seguranca e autorizacao
 Objetivo: proteger API por perfil de usuario e integracao automatizada.
 
-- [ ] Estrutura de autenticacao (JWT/OAuth2 resource server, conforme decisao de arquitetura).
-- [ ] Autorizacao por perfil:
-  - `CRIANCA` (somente leitura permitida)
-  - `PAI/MAE` (leitura e escrita administrativa)
+- [x] Estrutura de autenticacao (JWT/OAuth2 resource server, conforme decisao de arquitetura).
+- [x] Autorizacao por perfil:
+  - `CRIANCA` (somente leitura permitida, mapeado para `CHILD`)
+  - `PAI/MAE` (leitura e escrita administrativa, mapeado para `PARENT`)
 - [x] Endpoint seguro para automacao (n8n) com credencial dedicada.
 - [ ] Auditoria de alteracoes sensiveis.
-- [ ] Testes automatizados obrigatorios:
+- [x] Testes automatizados obrigatorios:
   - testes de autorizacao por role
   - testes de acesso negado
   - [x] testes de endpoint de automacao
@@ -232,6 +251,8 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Iniciar estrutura de autenticacao/autorizacao por usuarios com JWT Resource Server.
-- [ ] Introduzir autorizacao por role (`CRIANCA`, `PAI/MAE`) nos endpoints existentes.
-- [ ] Definir estrategia de transicao para autenticar WebApp e manter token dedicado para n8n.
+- [ ] Implementar endpoint de contexto de sessao para o front (`/api/v1/users/me`) com contas e perfil por conta.
+- [ ] Iniciar trilha de auditoria para alteracoes sensiveis (transacoes manuais, metas e regra de bonus).
+- [ ] Fechar pendencias de fundacao de banco:
+  - checks de valores monetarios positivos
+  - testes de migration de subida limpa do schema

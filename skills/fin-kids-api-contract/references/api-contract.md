@@ -8,9 +8,19 @@ Updated for the current codebase in this repository.
 - Content type: `application/json`
 - Time format: ISO-8601 UTC (`Instant`), example: `2026-02-27T12:00:00Z`
 - Monetary fields: decimal values with 2 fraction digits (domain allows `BigDecimal`)
+- User auth (WebApp): `Authorization: Bearer <jwt-google>`
 - Automation auth: `Authorization: Bearer <token>` required for `/api/v1/automation/**`
 - OpenAPI spec JSON: `/v3/api-docs`
 - Swagger UI: `/swagger-ui/index.html`
+
+Authentication model:
+- `/api/v1/automation/**`: dedicated automation token (`AutomationBearerAuth`)
+- other `/api/v1/**`: user JWT validated by OAuth2 Resource Server (`UserBearerAuth`)
+
+Authorization model by account:
+- `CHILD`: read operations
+- `PARENT`: read and write operations
+- Role lookup source: `account_users.profile_role`
 
 ## 2) Enums
 
@@ -48,6 +58,8 @@ Standard error body (handled by `ApiExceptionHandler` for domain errors):
 Mapped statuses:
 - `400 Bad Request`: validation errors (`MethodArgumentNotValidException`, `HandlerMethodValidationException`, `ConstraintViolationException`, `ValidationException`)
 - `401 Unauthorized`: missing/invalid automation token (`AutomationAuthenticationEntryPoint`)
+- `401 Unauthorized`: missing/invalid user JWT on protected user endpoints
+- `403 Forbidden`: authenticated user without permission for account/operation (`AccessDeniedException`)
 - `409 Conflict`: duplicated transaction evidence for same `accountId + origin + evidenceReference` (`DuplicateTransactionException`)
 - `404 Not Found`: missing resources (`ResourceNotFoundException`)
 - `422 Unprocessable Entity`: business rule conflict (`BusinessRuleException`)
@@ -101,6 +113,8 @@ Business behavior:
 
 Common errors:
 - `400` invalid payload or invalid field values
+- `401` missing/invalid user JWT
+- `403` user without write permission on target account
 - `409` duplicate evidence for the same `accountId + origin + evidenceReference`
 - `404` account not found
 - `422` insufficient balance on withdraw
@@ -141,6 +155,8 @@ Success response:
 
 Common errors:
 - `400` invalid params (`accountId`, `start`, `end`, or range)
+- `401` missing/invalid user JWT
+- `403` user without read permission on target account
 - `404` account not found
 
 ---
@@ -220,6 +236,8 @@ Success response:
 
 Common errors:
 - `400` invalid accountId
+- `401` missing/invalid user JWT
+- `403` user without read permission on target account
 - `404` account not found
 
 ### 5.2 Get monthly summary
@@ -266,6 +284,8 @@ Success response:
 
 Common errors:
 - `400` invalid `accountId`, `year`, or `month`
+- `401` missing/invalid user JWT
+- `403` user without read permission on target account
 - `404` account not found
 
 ---
@@ -310,6 +330,8 @@ Success response:
 
 Common errors:
 - `400` invalid payload
+- `401` missing/invalid user JWT
+- `403` user without write permission on target account
 - `404` account not found
 
 ### 6.2 List active goals
@@ -342,6 +364,8 @@ Success response:
 
 Common errors:
 - `400` invalid `accountId`
+- `401` missing/invalid user JWT
+- `403` user without read permission on target account
 - `404` account not found
 
 ### 6.3 Update goal
@@ -374,6 +398,8 @@ Success response:
 
 Common errors:
 - `400` invalid payload or `goalId`
+- `401` missing/invalid user JWT
+- `403` user without write permission on target account
 - `404` account or goal not found
 
 ### 6.4 Delete goal (soft delete)
@@ -395,6 +421,8 @@ Success response:
 
 Common errors:
 - `400` invalid params
+- `401` missing/invalid user JWT
+- `403` user without write permission on target account
 - `404` account or goal not found
 
 ---
@@ -427,6 +455,8 @@ Success response:
 
 Common errors:
 - `400` invalid `accountId`
+- `401` missing/invalid user JWT
+- `403` user without write permission on target account
 - `404` account not found or bonus rule not configured for account
 
 ### 7.2 Create or update bonus rule (upsert)
@@ -464,6 +494,8 @@ Success response:
 
 Common errors:
 - `400` invalid payload or `accountId`
+- `401` missing/invalid user JWT
+- `403` user without write permission on target account
 - `404` account not found
 
 ---
