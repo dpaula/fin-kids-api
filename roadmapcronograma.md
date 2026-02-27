@@ -72,6 +72,16 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Testes automatizados da entrega (servico + controller) com cenarios de sucesso e erro.
 - [x] Gate de cobertura elevado para classes core de servico/controller (>= 80% no JaCoCo check).
 
+### 3.7 Entrega concluida
+- [x] Testes de integracao end-to-end do fluxo de transacao via HTTP (`POST /transactions`).
+- [x] Validacao de persistencia real do fluxo:
+  - deposito bem-sucedido
+  - saque bem-sucedido com saldo suficiente
+  - bloqueio de saque por saldo insuficiente sem persistencia indevida
+- [x] Cobertura de erros de contrato no fluxo integrado:
+  - payload invalido (`400`)
+  - conta inexistente (`404`)
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -104,7 +114,7 @@ Objetivo: implementar comportamento principal do produto.
 - [x] Testes automatizados da entrega 3.2:
   - unitarios da camada de servico
   - testes de controller com MockMvc
-- [ ] Testes de integracao de fluxo completo de transacao (servico + persistencia + HTTP)
+- [x] Testes de integracao de fluxo completo de transacao (servico + persistencia + HTTP)
 - [x] Cobertura alvo da fase: minimo 65% do dominio core.
 
 ## Fase 3 - API REST v1
@@ -190,6 +200,5 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Implementar testes de integracao end-to-end do fluxo de transacao (`POST /transactions` + persistencia + regra de saldo).
 - [ ] Publicar documentacao OpenAPI/Swagger da API v1 para consumo do frontend/n8n.
 - [ ] Preparar endpoint seguro para automacao (token dedicado para n8n) como base da Fase 4/Fase 5.
