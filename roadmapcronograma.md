@@ -45,9 +45,13 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Repositories JPA iniciais criados.
 - [x] Teste automatizado de contexto executado com sucesso (`./mvnw test -Dspring.profiles.active=dev`).
 
-### 3.2 Em andamento (proxima entrega)
+### 3.2 Entrega concluida
 - [x] Camada de servicos de dominio para regras de transacao (entrada/saida e saldo nao negativo).
 - [x] Primeiros endpoints REST de transacoes.
+
+### 3.3 Entrega concluida
+- [x] Endpoints de conta/resumo para saldo atual e resumo mensal.
+- [x] Testes automatizados da camada de resumo (servico + controller).
 
 ## 4) Roadmap detalhado por fases
 
@@ -72,7 +76,7 @@ Objetivo: implementar comportamento principal do produto.
 - [x] Caso de uso: criar transacao `WITHDRAW` com bloqueio de saldo negativo.
 - [x] Calculo de saldo por historico de transacoes.
 - [x] Consulta de extrato por periodo.
-- [ ] Consulta de resumo mensal (por origem e por tipo).
+- [x] Consulta de resumo mensal (por origem e por tipo).
 - [x] Padronizacao de validacoes:
   - valores monetarios
   - datas
@@ -87,7 +91,7 @@ Objetivo: implementar comportamento principal do produto.
 ## Fase 3 - API REST v1
 Objetivo: entregar endpoints para consumo inicial do front e integracoes.
 
-- [ ] Endpoints de conta/resumo:
+- [x] Endpoints de conta/resumo:
   - saldo atual
   - resumo mensal
 - [x] Endpoints de transacoes:
@@ -167,6 +171,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Implementar endpoint de conta para saldo atual e resumo mensal.
 - [ ] Iniciar CRUD de metas (criar/listar/atualizar/remover).
+- [ ] Iniciar endpoint de regras de bonus (consulta e atualizacao).
 - [ ] Adicionar testes de integracao de repositorio para consultas agregadas (saldo/resumo).

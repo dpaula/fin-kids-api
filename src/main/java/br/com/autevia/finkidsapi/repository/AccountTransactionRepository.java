@@ -1,6 +1,8 @@
 package br.com.autevia.finkidsapi.repository;
 
 import br.com.autevia.finkidsapi.domain.entity.AccountTransaction;
+import br.com.autevia.finkidsapi.repository.projection.TransactionOriginTotalProjection;
+import br.com.autevia.finkidsapi.repository.projection.TransactionTypeTotalProjection;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -25,4 +27,36 @@ public interface AccountTransactionRepository extends JpaRepository<AccountTrans
             nativeQuery = true
     )
     BigDecimal calculateBalanceByAccountId(@Param("accountId") Long accountId);
+
+    @Query(
+            """
+            SELECT t.type AS type, COALESCE(SUM(t.amount), 0) AS total
+            FROM AccountTransaction t
+            WHERE t.account.id = :accountId
+              AND t.occurredAt >= :start
+              AND t.occurredAt < :end
+            GROUP BY t.type
+            """
+    )
+    List<TransactionTypeTotalProjection> summarizeMonthlyByType(
+            @Param("accountId") Long accountId,
+            @Param("start") Instant start,
+            @Param("end") Instant end
+    );
+
+    @Query(
+            """
+            SELECT t.origin AS origin, COALESCE(SUM(t.amount), 0) AS total
+            FROM AccountTransaction t
+            WHERE t.account.id = :accountId
+              AND t.occurredAt >= :start
+              AND t.occurredAt < :end
+            GROUP BY t.origin
+            """
+    )
+    List<TransactionOriginTotalProjection> summarizeMonthlyByOrigin(
+            @Param("accountId") Long accountId,
+            @Param("start") Instant start,
+            @Param("end") Instant end
+    );
 }
