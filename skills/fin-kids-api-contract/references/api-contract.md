@@ -202,7 +202,134 @@ Common errors:
 
 ---
 
-## 6) Maintenance Checklist
+## 6) Goals API
+
+### 6.1 Create goal
+
+- Method: `POST`
+- Path: `/api/v1/goals`
+
+Request body:
+
+```json
+{
+  "accountId": 1,
+  "name": "Bicicleta",
+  "targetAmount": 500.00
+}
+```
+
+Request fields:
+- `accountId` (number, required, `> 0`)
+- `name` (string, required, non-empty)
+- `targetAmount` (decimal, required, `> 0`)
+
+Success response:
+- Status: `201 Created`
+
+```json
+{
+  "goalId": 11,
+  "accountId": 1,
+  "name": "Bicicleta",
+  "targetAmount": 500.00,
+  "active": true,
+  "createdAt": "2026-02-27T12:00:00Z",
+  "updatedAt": "2026-02-27T12:00:00Z"
+}
+```
+
+Common errors:
+- `400` invalid payload
+- `404` account not found
+
+### 6.2 List active goals
+
+- Method: `GET`
+- Path: `/api/v1/goals`
+
+Query params:
+- `accountId` (required, number, `> 0`)
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "accountId": 1,
+  "goals": [
+    {
+      "goalId": 11,
+      "accountId": 1,
+      "name": "Bicicleta",
+      "targetAmount": 500.00,
+      "active": true,
+      "createdAt": "2026-02-27T12:00:00Z",
+      "updatedAt": "2026-02-27T12:00:00Z"
+    }
+  ]
+}
+```
+
+Common errors:
+- `400` invalid `accountId`
+- `404` account not found
+
+### 6.3 Update goal
+
+- Method: `PUT`
+- Path: `/api/v1/goals/{goalId}`
+
+Path params:
+- `goalId` (required, number, `> 0`)
+
+Request body:
+
+```json
+{
+  "accountId": 1,
+  "name": "Notebook",
+  "targetAmount": 3200.00
+}
+```
+
+Request fields:
+- `accountId` (required, number, `> 0`)
+- `name` (required, non-empty)
+- `targetAmount` (required, `> 0`)
+
+Success response:
+- Status: `200 OK`
+- Returns updated goal with same response shape from create.
+
+Common errors:
+- `400` invalid payload or `goalId`
+- `404` account or goal not found
+
+### 6.4 Delete goal (soft delete)
+
+- Method: `DELETE`
+- Path: `/api/v1/goals/{goalId}`
+
+Path params:
+- `goalId` (required, number, `> 0`)
+
+Query params:
+- `accountId` (required, number, `> 0`)
+
+Behavior:
+- Performs logical deletion by setting `active=false`.
+
+Success response:
+- Status: `204 No Content`
+
+Common errors:
+- `400` invalid params
+- `404` account or goal not found
+
+---
+
+## 7) Maintenance Checklist
 
 When adding or changing any controller/endpoint:
 

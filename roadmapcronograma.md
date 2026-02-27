@@ -53,6 +53,10 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Endpoints de conta/resumo para saldo atual e resumo mensal.
 - [x] Testes automatizados da camada de resumo (servico + controller).
 
+### 3.4 Entrega concluida
+- [x] CRUD inicial de metas (criar/listar/atualizar/remover com exclusao logica).
+- [x] Testes automatizados de metas (servico + controller).
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -97,7 +101,7 @@ Objetivo: entregar endpoints para consumo inicial do front e integracoes.
 - [x] Endpoints de transacoes:
   - criar transacao
   - listar por periodo
-- [ ] Endpoints de metas (CRUD inicial).
+- [x] Endpoints de metas (CRUD inicial).
 - [ ] Endpoints de regra de bonus (consulta/atualizacao).
 - [ ] Validacao de payload (Bean Validation + mensagens claras).
 - [x] Padrao de resposta HTTP e contrato de erro.
@@ -171,6 +175,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Iniciar CRUD de metas (criar/listar/atualizar/remover).
 - [ ] Iniciar endpoint de regras de bonus (consulta e atualizacao).
+- [ ] Consolidar validacao de payload com Bean Validation nas requests de controllers.
 - [ ] Adicionar testes de integracao de repositorio para consultas agregadas (saldo/resumo).
