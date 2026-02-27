@@ -140,6 +140,18 @@
                                     <includes>
                                         <include>br.com.autevia.finkidsapi.service.*Service</include>
                                         <include>br.com.autevia.finkidsapi.web.*Controller</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <rule>
+                                    <element>CLASS</element>
+                                    <includes>
                                         <include>br.com.autevia.finkidsapi.web.ApiExceptionHandler</include>
                                     </includes>
                                     <limits>

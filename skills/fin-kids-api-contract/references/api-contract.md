@@ -20,6 +20,14 @@ Updated for the current codebase in this repository.
 - `MANUAL`
 - `BONUS`
 
+### BonusConditionType
+- `NO_WITHDRAWALS_IN_MONTH`
+
+### BonusBaseType
+- `LAST_BALANCE`
+- `LAST_ALLOWANCE`
+- `MONTHLY_DEPOSITS`
+
 ## 3) Error Model
 
 Standard error body (handled by `ApiExceptionHandler` for domain errors):
@@ -331,7 +339,76 @@ Common errors:
 
 ---
 
-## 7) Maintenance Checklist
+## 7) Bonus Rule API
+
+### 7.1 Get bonus rule by account
+
+- Method: `GET`
+- Path: `/api/v1/accounts/{accountId}/bonus-rule`
+
+Path params:
+- `accountId` (required, number, `> 0`)
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "bonusRuleId": 15,
+  "accountId": 1,
+  "percentage": 10.00,
+  "conditionType": "NO_WITHDRAWALS_IN_MONTH",
+  "baseType": "MONTHLY_DEPOSITS",
+  "active": true,
+  "createdAt": "2026-02-27T14:00:00Z",
+  "updatedAt": "2026-02-27T14:00:00Z"
+}
+```
+
+Common errors:
+- `400` invalid `accountId`
+- `404` account not found or bonus rule not configured for account
+
+### 7.2 Create or update bonus rule (upsert)
+
+- Method: `PUT`
+- Path: `/api/v1/accounts/{accountId}/bonus-rule`
+
+Path params:
+- `accountId` (required, number, `> 0`)
+
+Request body:
+
+```json
+{
+  "percentage": 10.00,
+  "conditionType": "NO_WITHDRAWALS_IN_MONTH",
+  "baseType": "MONTHLY_DEPOSITS",
+  "active": true
+}
+```
+
+Request fields:
+- `percentage` (required, decimal between `0.01` and `100.00`)
+- `conditionType` (required, enum `BonusConditionType`)
+- `baseType` (required, enum `BonusBaseType`)
+- `active` (required, boolean)
+
+Behavior:
+- If rule does not exist for account: creates new bonus rule.
+- If rule already exists for account: updates existing record.
+
+Success response:
+- Status: `200 OK`
+- Returns the same response shape from `GET`.
+
+Common errors:
+- `400` invalid payload or `accountId`
+- `404` account not found
+
+---
+
+## 8) Maintenance Checklist
 
 When adding or changing any controller/endpoint:
 

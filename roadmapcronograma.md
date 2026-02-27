@@ -63,6 +63,15 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Cobertura automatizada com JaCoCo no build (`verify`) com regra minima aplicada.
 - [x] Testes de repositorio para consultas agregadas de saldo/resumo mensal.
 
+### 3.6 Entrega concluida
+- [x] Endpoints de regra de bonus implementados:
+  - `GET /api/v1/accounts/{accountId}/bonus-rule`
+  - `PUT /api/v1/accounts/{accountId}/bonus-rule`
+- [x] Camada de servico para consulta e upsert de regra de bonus por conta.
+- [x] Validacao de payload para regra de bonus (`percentage`, `conditionType`, `baseType`, `active`).
+- [x] Testes automatizados da entrega (servico + controller) com cenarios de sucesso e erro.
+- [x] Gate de cobertura elevado para classes core de servico/controller (>= 80% no JaCoCo check).
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -108,7 +117,7 @@ Objetivo: entregar endpoints para consumo inicial do front e integracoes.
   - criar transacao
   - listar por periodo
 - [x] Endpoints de metas (CRUD inicial).
-- [ ] Endpoints de regra de bonus (consulta/atualizacao).
+- [x] Endpoints de regra de bonus (consulta/atualizacao).
 - [x] Validacao de payload (Bean Validation + mensagens claras).
 - [x] Padrao de resposta HTTP e contrato de erro.
 - [ ] Documentacao tecnica inicial da API (OpenAPI/Swagger).
@@ -181,6 +190,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Iniciar endpoint de regras de bonus (consulta e atualizacao).
 - [ ] Implementar testes de integracao end-to-end do fluxo de transacao (`POST /transactions` + persistencia + regra de saldo).
 - [ ] Publicar documentacao OpenAPI/Swagger da API v1 para consumo do frontend/n8n.
+- [ ] Preparar endpoint seguro para automacao (token dedicado para n8n) como base da Fase 4/Fase 5.
