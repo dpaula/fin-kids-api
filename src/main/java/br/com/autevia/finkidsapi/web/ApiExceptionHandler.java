@@ -3,6 +3,7 @@ package br.com.autevia.finkidsapi.web;
 import br.com.autevia.finkidsapi.domain.exception.BusinessRuleException;
 import br.com.autevia.finkidsapi.domain.exception.DuplicateTransactionException;
 import br.com.autevia.finkidsapi.domain.exception.ResourceNotFoundException;
+import br.com.autevia.finkidsapi.domain.exception.UnauthorizedException;
 import br.com.autevia.finkidsapi.domain.exception.ValidationException;
 import br.com.autevia.finkidsapi.web.error.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -90,6 +91,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.FORBIDDEN, "Acesso negado para este recurso.", request);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message, HttpServletRequest request) {

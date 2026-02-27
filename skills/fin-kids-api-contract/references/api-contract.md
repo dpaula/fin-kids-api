@@ -59,6 +59,7 @@ Mapped statuses:
 - `400 Bad Request`: validation errors (`MethodArgumentNotValidException`, `HandlerMethodValidationException`, `ConstraintViolationException`, `ValidationException`)
 - `401 Unauthorized`: missing/invalid automation token (`AutomationAuthenticationEntryPoint`)
 - `401 Unauthorized`: missing/invalid user JWT on protected user endpoints
+- `401 Unauthorized`: authenticated context without valid identity claims (`UnauthorizedException`)
 - `403 Forbidden`: authenticated user without permission for account/operation (`AccessDeniedException`)
 - `409 Conflict`: duplicated transaction evidence for same `accountId + origin + evidenceReference` (`DuplicateTransactionException`)
 - `404 Not Found`: missing resources (`ResourceNotFoundException`)
@@ -500,7 +501,56 @@ Common errors:
 
 ---
 
-## 9) Maintenance Checklist
+## 9) Users API
+
+### 9.1 Get current authenticated user context
+
+- Method: `GET`
+- Path: `/api/v1/users/me`
+- Security: `Authorization: Bearer <jwt-google>` (`UserBearerAuth`)
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "userId": 10,
+  "fullName": "Maria Silva",
+  "email": "maria@email.com",
+  "globalRole": "PARENT",
+  "accounts": [
+    {
+      "accountId": 1,
+      "childName": "Lucas",
+      "profileRole": "PARENT"
+    },
+    {
+      "accountId": 2,
+      "childName": "Nina",
+      "profileRole": "CHILD"
+    }
+  ]
+}
+```
+
+Response fields:
+- `userId` (number): internal user id from `app_users.id`
+- `fullName` (string): user full name
+- `email` (string): authenticated e-mail
+- `globalRole` (enum `UserRole`): global role stored in `app_users.role`
+- `accounts[]` (array): list of linked accounts from `account_users`
+- `accounts[].accountId` (number): linked account id
+- `accounts[].childName` (string): child name of linked account
+- `accounts[].profileRole` (enum `UserRole`): role of user in that account (`CHILD` or `PARENT`)
+
+Common errors:
+- `401` missing/invalid JWT, or JWT without valid identity context
+- `404` user not found by authenticated email
+- `404` authenticated user without linked account
+
+---
+
+## 10) Maintenance Checklist
 
 When adding or changing any controller/endpoint:
 

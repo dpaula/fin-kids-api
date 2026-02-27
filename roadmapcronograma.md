@@ -133,6 +133,20 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - cenarios de leitura permitida para crianca
   - regressao dos fluxos existentes com autenticacao valida
 
+### 3.12 Entrega concluida
+- [x] Endpoint de contexto de sessao para WebApp implementado:
+  - `GET /api/v1/users/me`
+- [x] Contrato de sessao entregue com:
+  - dados basicos do usuario autenticado
+  - lista de contas vinculadas com `profileRole` por conta
+- [x] Regras de seguranca e consistencia aplicadas:
+  - `401` para usuario nao autenticado ou contexto invalido
+  - `404` para usuario inexistente ou sem vinculo de conta
+- [x] Testes automatizados da entrega:
+  - unitarios da camada de servico de sessao
+  - integracao HTTP cobrindo `200`, `401` e `404`
+  - regressao do teste de documentacao OpenAPI para novo endpoint
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -195,6 +209,7 @@ Objetivo: proteger API por perfil de usuario e integracao automatizada.
   - `CRIANCA` (somente leitura permitida, mapeado para `CHILD`)
   - `PAI/MAE` (leitura e escrita administrativa, mapeado para `PARENT`)
 - [x] Endpoint seguro para automacao (n8n) com credencial dedicada.
+- [x] Endpoint de contexto autenticado para bootstrap de sessao do front (`/api/v1/users/me`).
 - [ ] Auditoria de alteracoes sensiveis.
 - [x] Testes automatizados obrigatorios:
   - testes de autorizacao por role
@@ -251,7 +266,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Implementar endpoint de contexto de sessao para o front (`/api/v1/users/me`) com contas e perfil por conta.
 - [ ] Iniciar trilha de auditoria para alteracoes sensiveis (transacoes manuais, metas e regra de bonus).
 - [ ] Fechar pendencias de fundacao de banco:
   - checks de valores monetarios positivos

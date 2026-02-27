@@ -150,6 +150,7 @@ Objetivo deste modulo:
 - remover meta (somente pais)
 
 ### Usuarios
+- consultar contexto da sessao autenticada (`GET /api/v1/users/me`) para bootstrap do front-end
 - criar/atualizar vinculo de usuarios (pai/mae/crianca) com a conta
 - garantir permissoes administrativas para pai e mae
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grana API Product Guardian"
+  short_description: "PO tecnico e auditor da API GranaGalaxy"
+  default_prompt: "Use $grana-api-product-guardian to audit domain alignment, business rules, and integration readiness in fin-kids-api."
