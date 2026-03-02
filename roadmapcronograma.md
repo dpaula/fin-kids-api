@@ -162,6 +162,21 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - integracao HTTP validando criacao de eventos auditaveis
   - garantia de nao auditoria para endpoint de automacao
 
+### 3.14 Entrega concluida
+- [x] Endpoint administrativo para gestao de vinculos usuario-conta implementado:
+  - `GET /api/v1/accounts/{accountId}/user-links`
+  - `PUT /api/v1/accounts/{accountId}/user-links/{userId}`
+- [x] Regra de autorizacao aplicada no fluxo administrativo:
+  - apenas perfil com permissao de escrita na conta (`PARENT`) pode gerenciar vinculos
+- [x] Regra de negocio de upsert de vinculo entregue:
+  - cria quando nao existe
+  - atualiza `profileRole` quando ja existe
+- [x] Auditoria de mudancas de vinculo registrada na trilha sensivel (`audit_events`).
+- [x] Testes automatizados da entrega:
+  - unitarios do servico de vinculos
+  - testes de controller para contrato e validacao
+  - integracao HTTP cobrindo sucesso, `401`, `403`, `404`
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -226,12 +241,13 @@ Objetivo: proteger API por perfil de usuario e integracao automatizada.
 - [x] Endpoint seguro para automacao (n8n) com credencial dedicada.
 - [x] Endpoint de contexto autenticado para bootstrap de sessao do front (`/api/v1/users/me`).
 - [x] Auditoria de alteracoes sensiveis (transacoes manuais, metas e regra de bonus).
-- [ ] Endpoint administrativo para criar/atualizar vinculos de usuario-conta (`account_users`) com role por conta.
+- [x] Endpoint administrativo para criar/atualizar vinculos de usuario-conta (`account_users`) com role por conta.
 - [x] Testes automatizados obrigatorios:
   - testes de autorizacao por role
   - testes de acesso negado
+  - [x] testes de endpoint administrativo de vinculos
   - [x] testes de endpoint de automacao
-- [ ] Cobertura alvo da fase: minimo 75% em regras de seguranca e acesso.
+- [x] Cobertura alvo da fase: minimo 75% em regras de seguranca e acesso.
 
 ## Fase 5 - Integração de automacao (contrato API)
 Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
@@ -282,7 +298,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Entregar endpoint administrativo para criar/atualizar vinculos em `account_users` (pai/mae/crianca por conta).
 - [ ] Isolar ambiente de testes/CI de banco externo e remover defaults sensiveis de credenciais.
 - [ ] Fechar pendencias de fundacao de banco:
   - checks de valores monetarios positivos

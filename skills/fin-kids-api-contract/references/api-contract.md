@@ -550,7 +550,87 @@ Common errors:
 
 ---
 
-## 10) Audit Trail (Internal)
+## 10) Account User Links API
+
+### 10.1 List user links by account
+
+- Method: `GET`
+- Path: `/api/v1/accounts/{accountId}/user-links`
+- Security: `Authorization: Bearer <jwt-google>` (`UserBearerAuth`)
+
+Path params:
+- `accountId` (required, number, `> 0`)
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "accountId": 1,
+  "links": [
+    {
+      "linkId": 10,
+      "accountId": 1,
+      "userId": 2,
+      "userFullName": "Maria Silva",
+      "userEmail": "maria@email.com",
+      "profileRole": "PARENT",
+      "linkedAt": "2026-03-02T12:00:00Z"
+    }
+  ]
+}
+```
+
+Authorization rule:
+- only `PARENT` on the account can list links.
+
+Common errors:
+- `400` invalid `accountId`
+- `401` missing/invalid JWT
+- `403` user without administrative permission on target account
+- `404` account not found
+
+### 10.2 Create or update account-user link (upsert)
+
+- Method: `PUT`
+- Path: `/api/v1/accounts/{accountId}/user-links/{userId}`
+- Security: `Authorization: Bearer <jwt-google>` (`UserBearerAuth`)
+
+Path params:
+- `accountId` (required, number, `> 0`)
+- `userId` (required, number, `> 0`)
+
+Request body:
+
+```json
+{
+  "profileRole": "CHILD"
+}
+```
+
+Request fields:
+- `profileRole` (required, enum `UserRole`: `CHILD` or `PARENT`)
+
+Behavior:
+- if link does not exist: creates `account_users` record.
+- if link exists: updates `profile_role`.
+
+Authorization rule:
+- only `PARENT` on the account can create/update links.
+
+Success response:
+- Status: `200 OK`
+- Returns the created/updated link payload.
+
+Common errors:
+- `400` invalid payload or invalid path params
+- `401` missing/invalid JWT
+- `403` user without administrative permission on target account
+- `404` account or user not found
+
+---
+
+## 11) Audit Trail (Internal)
 
 The API persists audit events for sensitive user writes in `audit_events`.
 
@@ -558,6 +638,7 @@ Audited operations:
 - manual transaction creation (`POST /api/v1/transactions` with `origin=MANUAL`)
 - goal create/update/delete (`POST/PUT/DELETE /api/v1/goals`)
 - bonus rule upsert (`PUT /api/v1/accounts/{accountId}/bonus-rule`)
+- account-user link upsert (`PUT /api/v1/accounts/{accountId}/user-links/{userId}`)
 
 Stored audit fields:
 - `account_id`
@@ -576,7 +657,7 @@ Notes:
 
 ---
 
-## 11) Maintenance Checklist
+## 12) Maintenance Checklist
 
 When adding or changing any controller/endpoint:
 

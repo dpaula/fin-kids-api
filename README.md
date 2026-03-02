@@ -151,7 +151,8 @@ Objetivo deste modulo:
 
 ### Usuarios
 - consultar contexto da sessao autenticada (`GET /api/v1/users/me`) para bootstrap do front-end
-- criar/atualizar vinculo de usuarios (pai/mae/crianca) com a conta (**planejado para proxima fase**)
+- listar vinculos de usuarios por conta (`GET /api/v1/accounts/{accountId}/user-links`) para painel administrativo dos pais
+- criar/atualizar vinculo de usuarios por conta (`PUT /api/v1/accounts/{accountId}/user-links/{userId}`)
 - garantir permissoes administrativas para pai e mae via vinculo em `account_users`
 
 ## 6) Integracao com n8n + WhatsApp (Evo API)
