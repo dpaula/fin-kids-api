@@ -279,3 +279,94 @@ Regra:
   - trilha de auditoria para alteracoes sensiveis
   - endpoint administrativo para criar/atualizar vinculos em `account_users`
   - execucao automatizada de bonus (alem da configuracao)
+
+## 13) Pipeline de build e publicacao de imagem (planejada)
+
+Estrategia planejada para este repositorio:
+- usar profile Maven dedicado (`jib-docker-build`) com `jib-maven-plugin`;
+- gerar imagem Linux multi-arquitetura (`amd64` e `arm64`);
+- publicar no Docker Hub em `fplima/fin-kids-api`;
+- manter credenciais fora do `pom.xml` (somente via secrets/variaveis).
+
+### 13.1 Profile Maven (referencia para implementacao)
+
+```xml
+<profiles>
+  <profile>
+    <id>jib-docker-build</id>
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>3.5.1</version>
+          <configuration>
+            <from>
+              <image>eclipse-temurin:21-jre</image>
+              <platforms>
+                <platform>
+                  <architecture>arm64</architecture>
+                  <os>linux</os>
+                </platform>
+                <platform>
+                  <architecture>amd64</architecture>
+                  <os>linux</os>
+                </platform>
+              </platforms>
+            </from>
+            <to>
+              <image>${docker.image}</image>
+              <tags>
+                <tag>${project.version}</tag>
+                <tag>latest</tag>
+              </tags>
+              <auth>
+                <username>${env.DOCKERHUB_USERNAME}</username>
+                <password>${env.DOCKERHUB_TOKEN}</password>
+              </auth>
+            </to>
+            <container>
+              <ports>
+                <port>8080</port>
+              </ports>
+              <mainClass>br.com.autevia.finkidsapi.FinKidsApiApplication</mainClass>
+            </container>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+    <properties>
+      <docker.image>docker.io/fplima/fin-kids-api</docker.image>
+    </properties>
+  </profile>
+</profiles>
+```
+
+### 13.2 Regras de seguranca para credenciais
+- Nao commitar usuario/senha em texto no `pom.xml`.
+- Usar token de acesso do Docker Hub em segredo de CI (`DOCKERHUB_TOKEN`).
+- Usar `DOCKERHUB_USERNAME` como variavel de ambiente de CI.
+
+### 13.3 Comandos esperados
+- Build/push com profile:
+  - `./mvnw -Pjib-docker-build -DskipTests package`
+- Build com nome de imagem sobrescrito:
+  - `./mvnw -Pjib-docker-build -Ddocker.image=docker.io/fplima/fin-kids-api -DskipTests package`
+
+### 13.4 Fluxo de pipeline (GitHub Actions)
+- Pull Request:
+  - executar `./mvnw verify`
+  - nao publicar imagem
+- `main` e tags de release:
+  - executar `./mvnw verify`
+  - autenticar no Docker Hub com secrets
+  - executar profile `jib-docker-build` para publicar imagem
+  - publicar tags: `${project.version}`, `latest` (e opcionalmente SHA curto)

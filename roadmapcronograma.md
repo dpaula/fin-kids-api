@@ -284,6 +284,20 @@ Objetivo: estabilidade, observabilidade e padrao de release.
   - testes
   - cobertura
   - validacao de migrations
+- [ ] Pipeline de imagem Docker com profile Maven (`jib-docker-build`):
+  - adicionar profile no `pom.xml` com `jib-maven-plugin`
+  - configurar imagem destino `docker.io/fplima/fin-kids-api`
+  - configurar build multi-arquitetura Linux (`amd64` + `arm64`)
+  - configurar `mainClass` da API: `br.com.autevia.finkidsapi.FinKidsApiApplication`
+  - configurar porta de container (default atual: `8080`)
+- [ ] Publicacao segura no Docker Hub via CI:
+  - autenticar via `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` (secrets)
+  - proibir credenciais hardcoded no `pom.xml`
+  - publicar tags `latest` e `${project.version}`
+  - opcional: publicar tag por commit (`sha-curto`)
+- [ ] Regras de execucao da pipeline:
+  - Pull Request: executar `./mvnw verify` sem push de imagem
+  - branch `main` e tags de release: executar `verify` + push da imagem via profile Jib
 - [ ] Regra de qualidade:
   - build quebrado se teste falhar
   - build quebrado se cobertura minima nao for atingida
@@ -298,6 +312,7 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
+- [ ] Definir e versionar workflow de pipeline Docker (Jib + Docker Hub) sem credenciais em codigo.
 - [ ] Isolar ambiente de testes/CI de banco externo e remover defaults sensiveis de credenciais.
 - [ ] Fechar pendencias de fundacao de banco:
   - checks de valores monetarios positivos
