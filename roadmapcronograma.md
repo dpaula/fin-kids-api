@@ -210,6 +210,7 @@ Objetivo: proteger API por perfil de usuario e integracao automatizada.
   - `PAI/MAE` (leitura e escrita administrativa, mapeado para `PARENT`)
 - [x] Endpoint seguro para automacao (n8n) com credencial dedicada.
 - [x] Endpoint de contexto autenticado para bootstrap de sessao do front (`/api/v1/users/me`).
+- [ ] Endpoint administrativo para criar/atualizar vinculos de usuario-conta (`account_users`) com role por conta.
 - [ ] Auditoria de alteracoes sensiveis.
 - [x] Testes automatizados obrigatorios:
   - testes de autorizacao por role
@@ -224,7 +225,7 @@ Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
 - [x] Suporte a evidencia da transacao (id/hash/url interna).
 - [x] Regras de idempotencia para evitar duplicidade.
 - [x] Mensagens de retorno para integracao (sucesso/erro de negocio).
-- [ ] Testes automatizados obrigatorios:
+- [x] Testes automatizados obrigatorios:
   - [x] integracao do endpoint de automacao
   - [x] cenarios de duplicidade e saldo insuficiente
 - [ ] Cobertura alvo da fase: minimo 75% nos fluxos de automacao.
@@ -232,7 +233,7 @@ Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
 ## Fase 6 - Metas e bonus educacional (MVP expandido)
 Objetivo: habilitar recursos educacionais previstos no produto.
 
-- [ ] Regras de bonus configuraveis por conta.
+- [x] Regras de bonus configuraveis por conta (consulta/upsert da regra por conta).
 - [ ] Execucao de bonus (job/agendamento) com trilha auditavel.
 - [ ] Evolucao de metas com progresso por saldo.
 - [ ] Endpoints de consulta para tela crianca e pais.
@@ -267,6 +268,8 @@ Um item so pode ser marcado como concluido quando:
 
 ## 6) Proxima entrega recomendada (curto prazo)
 - [ ] Iniciar trilha de auditoria para alteracoes sensiveis (transacoes manuais, metas e regra de bonus).
+- [ ] Entregar endpoint administrativo para criar/atualizar vinculos em `account_users` (pai/mae/crianca por conta).
+- [ ] Isolar ambiente de testes/CI de banco externo e remover defaults sensiveis de credenciais.
 - [ ] Fechar pendencias de fundacao de banco:
   - checks de valores monetarios positivos
   - testes de migration de subida limpa do schema

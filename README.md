@@ -151,8 +151,8 @@ Objetivo deste modulo:
 
 ### Usuarios
 - consultar contexto da sessao autenticada (`GET /api/v1/users/me`) para bootstrap do front-end
-- criar/atualizar vinculo de usuarios (pai/mae/crianca) com a conta
-- garantir permissoes administrativas para pai e mae
+- criar/atualizar vinculo de usuarios (pai/mae/crianca) com a conta (**planejado para proxima fase**)
+- garantir permissoes administrativas para pai e mae via vinculo em `account_users`
 
 ## 6) Integracao com n8n + WhatsApp (Evo API)
 
@@ -210,7 +210,7 @@ Regra:
 ## 8) Roadmap de desenvolvimento
 
 ### Fase 1 - Base funcional da API (prioridade maxima)
-1. Banco + migrations (Flyway)
+1. Banco + migrations (Liquibase)
 2. Entidades principais (conta, transacoes, regras, metas, usuarios)
 3. Endpoints basicos:
    - criar transacao
@@ -262,6 +262,19 @@ Regra:
 
 ## 12) Status atual do repositorio
 
-- Projeto em inicio.
-- Este README define o contrato de produto e direcao tecnica inicial.
-- Implementacao da camada de dominio e banco sera conduzida nas proximas fases.
+- API ja possui base funcional do dominio e persistencia com Liquibase.
+- Endpoints core implementados:
+  - transacoes (criacao/listagem)
+  - saldo e resumo mensal
+  - metas (CRUD inicial com exclusao logica)
+  - regra de bonus (consulta/upsert de configuracao)
+  - automacao segura (`/api/v1/automation/transactions`)
+  - contexto autenticado de usuario (`GET /api/v1/users/me`)
+- Seguranca implementada com dois canais:
+  - JWT de usuario (OAuth2 Resource Server)
+  - token dedicado para automacao n8n
+- Documentacao OpenAPI/Swagger e cobertura automatizada com testes estao ativas no build.
+- Pendencias principais de roadmap:
+  - trilha de auditoria para alteracoes sensiveis
+  - endpoint administrativo para criar/atualizar vinculos em `account_users`
+  - execucao automatizada de bonus (alem da configuracao)

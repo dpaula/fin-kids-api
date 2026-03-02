@@ -14,7 +14,7 @@ Este arquivo centraliza contexto para agentes e contribuidores trabalharem neste
 - Build: Maven Wrapper (`./mvnw`)
 - Tipo de API: REST
 - Config atual: `src/main/resources/application.yaml`
-- Observacao: conexao de banco e modelagem final ainda serao definidas nas proximas fases.
+- Observacao: persistencia com Liquibase e modelagem core ja implementadas; evolucoes seguem no roadmap.
 
 ## 3) Modulos do ecossistema (fora deste repo)
 - WebApp (React): cliente visual para Crianca e Pais.
@@ -64,6 +64,7 @@ Este arquivo centraliza contexto para agentes e contribuidores trabalharem neste
 - Consistencia de saldo e historico auditavel sao inegociaveis.
 - Regras de bonus devem ser explicitas e versionaveis quando entrarem em producao.
 
-## 10) Status inicial
-- Repositorio em fase inicial.
-- Prioridade imediata: definir modelo de dados, migrations Flyway e endpoints basicos.
+## 10) Status atual
+- Repositorio com base funcional entregue (transacoes, saldo/resumo, metas, regra de bonus e automacao segura).
+- Seguranca por JWT (usuarios) e token dedicado (automacao) implementada.
+- Proxima prioridade: trilha de auditoria, gestao administrativa de vinculos `account_users` e endurecimento de ambiente/CI.
