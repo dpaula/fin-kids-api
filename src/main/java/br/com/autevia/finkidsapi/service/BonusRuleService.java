@@ -2,13 +2,17 @@ package br.com.autevia.finkidsapi.service;
 
 import br.com.autevia.finkidsapi.domain.entity.Account;
 import br.com.autevia.finkidsapi.domain.entity.BonusRule;
+import br.com.autevia.finkidsapi.domain.enums.AuditActionType;
+import br.com.autevia.finkidsapi.domain.enums.AuditResourceType;
 import br.com.autevia.finkidsapi.domain.exception.ResourceNotFoundException;
 import br.com.autevia.finkidsapi.domain.exception.ValidationException;
 import br.com.autevia.finkidsapi.repository.AccountRepository;
 import br.com.autevia.finkidsapi.repository.BonusRuleRepository;
+import br.com.autevia.finkidsapi.service.dto.audit.AuditRecordCommand;
 import br.com.autevia.finkidsapi.service.dto.bonus.BonusRuleResult;
 import br.com.autevia.finkidsapi.service.dto.bonus.UpdateBonusRuleCommand;
 import java.math.BigDecimal;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +24,16 @@ public class BonusRuleService {
 
     private final AccountRepository accountRepository;
     private final BonusRuleRepository bonusRuleRepository;
+    private final AuditTrailService auditTrailService;
 
-    public BonusRuleService(AccountRepository accountRepository, BonusRuleRepository bonusRuleRepository) {
+    public BonusRuleService(
+            AccountRepository accountRepository,
+            BonusRuleRepository bonusRuleRepository,
+            AuditTrailService auditTrailService
+    ) {
         this.accountRepository = accountRepository;
         this.bonusRuleRepository = bonusRuleRepository;
+        this.auditTrailService = auditTrailService;
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +54,8 @@ public class BonusRuleService {
         validateCommand(command);
 
         Account account = findAccountOrThrow(accountId);
-        BonusRule rule = bonusRuleRepository.findByAccountId(accountId)
+        Optional<BonusRule> existingRule = bonusRuleRepository.findByAccountId(accountId);
+        BonusRule rule = existingRule
                 .map(existing -> updateExistingRule(existing, command))
                 .orElseGet(() -> new BonusRule(
                         account,
@@ -55,6 +66,14 @@ public class BonusRuleService {
                 ));
 
         BonusRule saved = bonusRuleRepository.save(rule);
+        boolean created = existingRule.isEmpty();
+        auditTrailService.record(new AuditRecordCommand(
+                accountId,
+                AuditActionType.BONUS_RULE_UPSERTED,
+                AuditResourceType.BONUS_RULE,
+                saved.getId(),
+                buildAuditPayload(saved, created)
+        ));
         return toResult(saved);
     }
 
@@ -112,5 +131,16 @@ public class BonusRuleService {
                 rule.getCreatedAt(),
                 rule.getUpdatedAt()
         );
+    }
+
+    private String buildAuditPayload(BonusRule saved, boolean created) {
+        return "created=%s, percentage=%s, conditionType=%s, baseType=%s, active=%s"
+                .formatted(
+                        created,
+                        saved.getPercentage(),
+                        saved.getConditionType(),
+                        saved.getBaseType(),
+                        saved.isActive()
+                );
     }
 }

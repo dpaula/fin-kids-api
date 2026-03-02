@@ -40,11 +40,14 @@ class TransactionServiceTest {
     @Mock
     private AccountTransactionRepository accountTransactionRepository;
 
+    @Mock
+    private AuditTrailService auditTrailService;
+
     private TransactionService transactionService;
 
     @BeforeEach
     void setUp() {
-        transactionService = new TransactionService(accountRepository, accountTransactionRepository);
+        transactionService = new TransactionService(accountRepository, accountTransactionRepository, auditTrailService);
     }
 
     @Test
@@ -75,6 +78,7 @@ class TransactionServiceTest {
         assertThat(result.transactionId()).isEqualTo(10L);
         assertThat(result.updatedBalance()).isEqualByComparingTo("150.00");
         verify(accountTransactionRepository).save(any(AccountTransaction.class));
+        verify(auditTrailService).record(any());
     }
 
     @Test
@@ -100,6 +104,7 @@ class TransactionServiceTest {
                 .hasMessageContaining("Saldo insuficiente");
 
         verify(accountTransactionRepository, never()).save(any(AccountTransaction.class));
+        verify(auditTrailService, never()).record(any());
     }
 
     @Test
@@ -130,6 +135,7 @@ class TransactionServiceTest {
                 .hasMessageContaining("Transacao duplicada");
 
         verify(accountTransactionRepository, never()).save(any(AccountTransaction.class));
+        verify(auditTrailService, never()).record(any());
     }
 
     @Test
@@ -160,6 +166,7 @@ class TransactionServiceTest {
         assertThatThrownBy(() -> transactionService.createTransaction(command))
                 .isInstanceOf(DuplicateTransactionException.class)
                 .hasMessageContaining("Transacao duplicada");
+        verify(auditTrailService, never()).record(any());
     }
 
     @Test

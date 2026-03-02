@@ -147,6 +147,21 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - integracao HTTP cobrindo `200`, `401` e `404`
   - regressao do teste de documentacao OpenAPI para novo endpoint
 
+### 3.13 Entrega concluida
+- [x] Trilha de auditoria para alteracoes sensiveis implementada.
+- [x] Persistencia de eventos de auditoria via tabela dedicada `audit_events` com indices para consultas por conta e tempo.
+- [x] Auditoria aplicada nos fluxos sensiveis:
+  - criacao de transacao manual
+  - criacao/atualizacao/remocao de metas
+  - upsert da regra de bonus
+- [x] Contexto do ator autenticado registrado em cada evento:
+  - email do usuario autenticado
+  - usuario global (quando encontrado no cadastro interno)
+- [x] Testes automatizados da entrega:
+  - unitario da camada de auditoria
+  - integracao HTTP validando criacao de eventos auditaveis
+  - garantia de nao auditoria para endpoint de automacao
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -210,8 +225,8 @@ Objetivo: proteger API por perfil de usuario e integracao automatizada.
   - `PAI/MAE` (leitura e escrita administrativa, mapeado para `PARENT`)
 - [x] Endpoint seguro para automacao (n8n) com credencial dedicada.
 - [x] Endpoint de contexto autenticado para bootstrap de sessao do front (`/api/v1/users/me`).
+- [x] Auditoria de alteracoes sensiveis (transacoes manuais, metas e regra de bonus).
 - [ ] Endpoint administrativo para criar/atualizar vinculos de usuario-conta (`account_users`) com role por conta.
-- [ ] Auditoria de alteracoes sensiveis.
 - [x] Testes automatizados obrigatorios:
   - testes de autorizacao por role
   - testes de acesso negado
@@ -267,7 +282,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Iniciar trilha de auditoria para alteracoes sensiveis (transacoes manuais, metas e regra de bonus).
 - [ ] Entregar endpoint administrativo para criar/atualizar vinculos em `account_users` (pai/mae/crianca por conta).
 - [ ] Isolar ambiente de testes/CI de banco externo e remover defaults sensiveis de credenciais.
 - [ ] Fechar pendencias de fundacao de banco:

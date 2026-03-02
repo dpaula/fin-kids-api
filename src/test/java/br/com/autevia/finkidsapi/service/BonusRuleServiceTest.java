@@ -3,6 +3,8 @@ package br.com.autevia.finkidsapi.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import br.com.autevia.finkidsapi.domain.entity.Account;
@@ -34,11 +36,14 @@ class BonusRuleServiceTest {
     @Mock
     private BonusRuleRepository bonusRuleRepository;
 
+    @Mock
+    private AuditTrailService auditTrailService;
+
     private BonusRuleService bonusRuleService;
 
     @BeforeEach
     void setUp() {
-        bonusRuleService = new BonusRuleService(accountRepository, bonusRuleRepository);
+        bonusRuleService = new BonusRuleService(accountRepository, bonusRuleRepository, auditTrailService);
     }
 
     @Test
@@ -86,6 +91,7 @@ class BonusRuleServiceTest {
         assertThat(result.percentage()).isEqualByComparingTo("10.00");
         assertThat(result.baseType()).isEqualTo(BonusBaseType.LAST_BALANCE);
         assertThat(result.active()).isTrue();
+        verify(auditTrailService).record(any());
     }
 
     @Test
@@ -110,6 +116,7 @@ class BonusRuleServiceTest {
         assertThat(result.percentage()).isEqualByComparingTo("8.50");
         assertThat(result.baseType()).isEqualTo(BonusBaseType.MONTHLY_DEPOSITS);
         assertThat(result.active()).isFalse();
+        verify(auditTrailService).record(any());
     }
 
     @Test
@@ -124,6 +131,7 @@ class BonusRuleServiceTest {
         assertThatThrownBy(() -> bonusRuleService.upsertRule(1L, command))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("percentage");
+        verify(auditTrailService, never()).record(any());
     }
 
     @Test

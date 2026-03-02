@@ -550,7 +550,33 @@ Common errors:
 
 ---
 
-## 10) Maintenance Checklist
+## 10) Audit Trail (Internal)
+
+The API persists audit events for sensitive user writes in `audit_events`.
+
+Audited operations:
+- manual transaction creation (`POST /api/v1/transactions` with `origin=MANUAL`)
+- goal create/update/delete (`POST/PUT/DELETE /api/v1/goals`)
+- bonus rule upsert (`PUT /api/v1/accounts/{accountId}/bonus-rule`)
+
+Stored audit fields:
+- `account_id`
+- `actor_email`
+- `actor_user_id` (when actor exists in `app_users`)
+- `actor_global_role` (when actor exists in `app_users`)
+- `action_type`
+- `resource_type`
+- `resource_id`
+- `payload_summary`
+- `created_at`
+
+Notes:
+- Automation endpoint (`POST /api/v1/automation/transactions`) is not recorded in this user-sensitive audit trail.
+- Audit events are created only after successful write operations.
+
+---
+
+## 11) Maintenance Checklist
 
 When adding or changing any controller/endpoint:
 

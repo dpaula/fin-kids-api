@@ -2,10 +2,13 @@ package br.com.autevia.finkidsapi.service;
 
 import br.com.autevia.finkidsapi.domain.entity.Account;
 import br.com.autevia.finkidsapi.domain.entity.Goal;
+import br.com.autevia.finkidsapi.domain.enums.AuditActionType;
+import br.com.autevia.finkidsapi.domain.enums.AuditResourceType;
 import br.com.autevia.finkidsapi.domain.exception.ResourceNotFoundException;
 import br.com.autevia.finkidsapi.domain.exception.ValidationException;
 import br.com.autevia.finkidsapi.repository.AccountRepository;
 import br.com.autevia.finkidsapi.repository.GoalRepository;
+import br.com.autevia.finkidsapi.service.dto.audit.AuditRecordCommand;
 import br.com.autevia.finkidsapi.service.dto.goal.CreateGoalCommand;
 import br.com.autevia.finkidsapi.service.dto.goal.GoalItemResult;
 import br.com.autevia.finkidsapi.service.dto.goal.GoalListResult;
@@ -22,10 +25,16 @@ public class GoalService {
 
     private final AccountRepository accountRepository;
     private final GoalRepository goalRepository;
+    private final AuditTrailService auditTrailService;
 
-    public GoalService(AccountRepository accountRepository, GoalRepository goalRepository) {
+    public GoalService(
+            AccountRepository accountRepository,
+            GoalRepository goalRepository,
+            AuditTrailService auditTrailService
+    ) {
         this.accountRepository = accountRepository;
         this.goalRepository = goalRepository;
+        this.auditTrailService = auditTrailService;
     }
 
     @Transactional
@@ -36,6 +45,14 @@ public class GoalService {
         Goal goal = new Goal(account, command.name().trim(), command.targetAmount(), true);
 
         Goal saved = goalRepository.save(goal);
+        auditTrailService.record(new AuditRecordCommand(
+                account.getId(),
+                AuditActionType.GOAL_CREATED,
+                AuditResourceType.GOAL,
+                saved.getId(),
+                "name=%s, targetAmount=%s, active=%s"
+                        .formatted(saved.getName(), saved.getTargetAmount(), saved.isActive())
+        ));
         return toResult(saved);
     }
 
@@ -60,10 +77,20 @@ public class GoalService {
         Goal goal = goalRepository.findByIdAndAccountIdAndActiveTrue(goalId, command.accountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Meta nao encontrada para id=" + goalId));
 
+        String previousName = goal.getName();
+        BigDecimal previousTargetAmount = goal.getTargetAmount();
         goal.setName(command.name().trim());
         goal.setTargetAmount(command.targetAmount());
 
         Goal saved = goalRepository.save(goal);
+        auditTrailService.record(new AuditRecordCommand(
+                command.accountId(),
+                AuditActionType.GOAL_UPDATED,
+                AuditResourceType.GOAL,
+                saved.getId(),
+                "oldName=%s, newName=%s, oldTargetAmount=%s, newTargetAmount=%s"
+                        .formatted(previousName, saved.getName(), previousTargetAmount, saved.getTargetAmount())
+        ));
         return toResult(saved);
     }
 
@@ -76,8 +103,17 @@ public class GoalService {
         Goal goal = goalRepository.findByIdAndAccountIdAndActiveTrue(goalId, accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meta nao encontrada para id=" + goalId));
 
+        String goalName = goal.getName();
+        BigDecimal goalTargetAmount = goal.getTargetAmount();
         goal.setActive(false);
         goalRepository.save(goal);
+        auditTrailService.record(new AuditRecordCommand(
+                accountId,
+                AuditActionType.GOAL_DELETED,
+                AuditResourceType.GOAL,
+                goalId,
+                "name=%s, targetAmount=%s, active=false".formatted(goalName, goalTargetAmount)
+        ));
     }
 
     private void validateCreateOrUpdateCommand(Long accountId, String name, BigDecimal targetAmount) {

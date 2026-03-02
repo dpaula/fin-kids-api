@@ -2,6 +2,8 @@ package br.com.autevia.finkidsapi.service;
 
 import br.com.autevia.finkidsapi.domain.entity.Account;
 import br.com.autevia.finkidsapi.domain.entity.AccountTransaction;
+import br.com.autevia.finkidsapi.domain.enums.AuditActionType;
+import br.com.autevia.finkidsapi.domain.enums.AuditResourceType;
 import br.com.autevia.finkidsapi.domain.enums.TransactionOrigin;
 import br.com.autevia.finkidsapi.domain.enums.TransactionType;
 import br.com.autevia.finkidsapi.domain.exception.BusinessRuleException;
@@ -14,6 +16,7 @@ import br.com.autevia.finkidsapi.service.dto.CreateTransactionCommand;
 import br.com.autevia.finkidsapi.service.dto.CreateTransactionResult;
 import br.com.autevia.finkidsapi.service.dto.TransactionItemResult;
 import br.com.autevia.finkidsapi.service.dto.TransactionListResult;
+import br.com.autevia.finkidsapi.service.dto.audit.AuditRecordCommand;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -28,13 +31,16 @@ public class TransactionService {
 
     private final AccountRepository accountRepository;
     private final AccountTransactionRepository accountTransactionRepository;
+    private final AuditTrailService auditTrailService;
 
     public TransactionService(
             AccountRepository accountRepository,
-            AccountTransactionRepository accountTransactionRepository
+            AccountTransactionRepository accountTransactionRepository,
+            AuditTrailService auditTrailService
     ) {
         this.accountRepository = accountRepository;
         this.accountTransactionRepository = accountTransactionRepository;
+        this.auditTrailService = auditTrailService;
     }
 
     @Transactional
@@ -75,6 +81,15 @@ public class TransactionService {
             throw ex;
         }
         BigDecimal updatedBalance = applyAmount(currentBalance, command.type(), command.amount());
+        if (command.origin() == TransactionOrigin.MANUAL) {
+            auditTrailService.record(new AuditRecordCommand(
+                    account.getId(),
+                    AuditActionType.TRANSACTION_MANUAL_CREATED,
+                    AuditResourceType.TRANSACTION,
+                    saved.getId(),
+                    buildManualTransactionAuditPayload(command, updatedBalance)
+            ));
+        }
 
         return new CreateTransactionResult(saved.getId(), updatedBalance);
     }
@@ -156,6 +171,19 @@ public class TransactionService {
                 origin,
                 evidenceReference
         );
+    }
+
+    private String buildManualTransactionAuditPayload(CreateTransactionCommand command, BigDecimal updatedBalance) {
+        return "type=%s, origin=%s, amount=%s, description=%s, evidenceReference=%s, occurredAt=%s, updatedBalance=%s"
+                .formatted(
+                        command.type(),
+                        command.origin(),
+                        command.amount(),
+                        command.description().trim(),
+                        command.evidenceReference(),
+                        command.occurredAt(),
+                        updatedBalance
+                );
     }
 
     private TransactionItemResult toItem(AccountTransaction transaction) {

@@ -35,11 +35,14 @@ class GoalServiceTest {
     @Mock
     private GoalRepository goalRepository;
 
+    @Mock
+    private AuditTrailService auditTrailService;
+
     private GoalService goalService;
 
     @BeforeEach
     void setUp() {
-        goalService = new GoalService(accountRepository, goalRepository);
+        goalService = new GoalService(accountRepository, goalRepository, auditTrailService);
     }
 
     @Test
@@ -64,6 +67,7 @@ class GoalServiceTest {
         assertThat(result.name()).isEqualTo("Bicicleta");
         assertThat(result.targetAmount()).isEqualByComparingTo("500.00");
         assertThat(result.active()).isTrue();
+        verify(auditTrailService).record(any());
     }
 
     @Test
@@ -100,6 +104,7 @@ class GoalServiceTest {
         assertThat(result.goalId()).isEqualTo(11L);
         assertThat(result.name()).isEqualTo("Notebook");
         assertThat(result.targetAmount()).isEqualByComparingTo("3200.00");
+        verify(auditTrailService).record(any());
     }
 
     @Test
@@ -114,6 +119,7 @@ class GoalServiceTest {
 
         assertThat(existing.isActive()).isFalse();
         verify(goalRepository).save(existing);
+        verify(auditTrailService).record(any());
     }
 
     @Test
