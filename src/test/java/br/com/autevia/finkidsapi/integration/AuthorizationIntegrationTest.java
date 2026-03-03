@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @Transactional
 class AuthorizationIntegrationTest {
 

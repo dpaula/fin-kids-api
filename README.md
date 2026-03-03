@@ -275,6 +275,8 @@ Regra:
   - JWT de usuario (OAuth2 Resource Server)
   - token dedicado para automacao n8n
 - Documentacao OpenAPI/Swagger e cobertura automatizada com testes estao ativas no build.
+- Testes de integracao/repositorio rodam no profile `test` com banco efemero via Testcontainers (MySQL), sem dependencia do MySQL remoto.
+- Configuracoes de banco para `prod` nao possuem mais defaults sensiveis de credenciais.
 - Pendencias principais de roadmap:
   - execucao automatizada de bonus (alem da configuracao)
   - evolucao de metas/progresso e consultas dedicadas para tela da crianca/pais

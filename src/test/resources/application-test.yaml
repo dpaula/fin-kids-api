@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: "jdbc:tc:mysql:8.4.0:///fin_kids_test?TC_DAEMON=true"
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
+  jpa:
+    show-sql: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost/test-jwks
+
+app:
+  security:
+    automation:
+      token: test-automation-token

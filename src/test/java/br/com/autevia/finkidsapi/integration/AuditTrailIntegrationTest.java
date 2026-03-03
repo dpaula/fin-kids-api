@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @TestPropertySource(properties = "app.security.automation.token=test-automation-token")
 @Transactional
 class AuditTrailIntegrationTest {

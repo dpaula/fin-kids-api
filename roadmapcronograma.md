@@ -192,6 +192,22 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Teste automatizado de smoke do script:
   - `scripts/test-release-local.sh`
 
+### 3.16 Entrega concluida
+- [x] Ambiente de testes isolado de banco externo implementado com profile dedicado:
+  - `application-test.yaml` com datasource via Testcontainers JDBC (`jdbc:tc:mysql:8.4.0`)
+  - token de automacao de teste e `jwk-set-uri` de teste para evitar dependencias externas em bootstrap
+- [x] Testes de integracao e repositorio migrados de `@ActiveProfiles("dev")` para `@ActiveProfiles("test")`.
+- [x] Teste de contexto principal (`FinKidsApiApplicationTests`) alinhado ao profile `test`.
+- [x] Dependencias de Testcontainers adicionadas no `pom.xml` (test scope):
+  - `org.testcontainers:junit-jupiter`
+  - `org.testcontainers:mysql`
+  - `org.testcontainers:jdbc`
+- [x] Remocao de defaults sensiveis em configuracoes de ambiente:
+  - `application-prod.yaml` sem usuario/senha default de banco
+  - `application-dev.yaml` sem host/credenciais sensiveis hardcoded
+- [x] Validacao local da entrega:
+  - `./mvnw verify` com sucesso sem dependencia de MySQL remoto para testes
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -299,6 +315,7 @@ Objetivo: estabilidade, observabilidade e padrao de release.
   - testes
   - cobertura
   - validacao de migrations
+- [x] Isolar ambiente de testes/CI de banco externo e remover defaults sensiveis de credenciais.
 - [x] Pipeline de imagem Docker com profile Maven (`jib-docker-build`):
   - adicionar profile no `pom.xml` com `jib-maven-plugin`
   - configurar imagem destino `docker.io/fplima/fin-kids-api`
@@ -327,7 +344,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Isolar ambiente de testes/CI de banco externo e remover defaults sensiveis de credenciais.
 - [ ] Fechar pendencias de fundacao de banco:
   - checks de valores monetarios positivos
   - testes de migration de subida limpa do schema
