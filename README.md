@@ -276,97 +276,46 @@ Regra:
   - token dedicado para automacao n8n
 - Documentacao OpenAPI/Swagger e cobertura automatizada com testes estao ativas no build.
 - Pendencias principais de roadmap:
-  - trilha de auditoria para alteracoes sensiveis
-  - endpoint administrativo para criar/atualizar vinculos em `account_users`
   - execucao automatizada de bonus (alem da configuracao)
+  - evolucao de metas/progresso e consultas dedicadas para tela da crianca/pais
+  - endurecimento operacional (health/readiness, metricas e logs estruturados)
 
-## 13) Pipeline de build e publicacao de imagem (planejada)
+## 13) Release local de imagem Docker (implementado)
 
-Estrategia planejada para este repositorio:
-- usar profile Maven dedicado (`jib-docker-build`) com `jib-maven-plugin`;
-- gerar imagem Linux multi-arquitetura (`amd64` e `arm64`);
-- publicar no Docker Hub em `fplima/fin-kids-api`;
-- manter credenciais fora do `pom.xml` (somente via secrets/variaveis).
+Este repositorio usa release local para publicacao de imagem no Docker Hub, sem dependencia de pipeline GitHub.
 
-### 13.1 Profile Maven (referencia para implementacao)
+Implementacao atual:
+- profile Maven `jib-docker-build` no `pom.xml`;
+- build Linux multi-arquitetura (`amd64` + `arm64`);
+- imagem destino default: `docker.io/fplima/fin-kids-api`;
+- tags publicadas: `${project.version}` e `latest`;
+- autenticacao Docker Hub hardcoded no profile (somente ambiente de desenvolvimento/teste).
 
-```xml
-<profiles>
-  <profile>
-    <id>jib-docker-build</id>
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>com.google.cloud.tools</groupId>
-          <artifactId>jib-maven-plugin</artifactId>
-          <version>3.5.1</version>
-          <configuration>
-            <from>
-              <image>eclipse-temurin:21-jre</image>
-              <platforms>
-                <platform>
-                  <architecture>arm64</architecture>
-                  <os>linux</os>
-                </platform>
-                <platform>
-                  <architecture>amd64</architecture>
-                  <os>linux</os>
-                </platform>
-              </platforms>
-            </from>
-            <to>
-              <image>${docker.image}</image>
-              <tags>
-                <tag>${project.version}</tag>
-                <tag>latest</tag>
-              </tags>
-              <auth>
-                <username>${env.DOCKERHUB_USERNAME}</username>
-                <password>${env.DOCKERHUB_TOKEN}</password>
-              </auth>
-            </to>
-            <container>
-              <ports>
-                <port>8080</port>
-              </ports>
-              <mainClass>br.com.autevia.finkidsapi.FinKidsApiApplication</mainClass>
-            </container>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>build</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </build>
-    <properties>
-      <docker.image>docker.io/fplima/fin-kids-api</docker.image>
-    </properties>
-  </profile>
-</profiles>
-```
+### 13.1 Script oficial de release local
 
-### 13.2 Regras de seguranca para credenciais
-- Nao commitar usuario/senha em texto no `pom.xml`.
-- Usar token de acesso do Docker Hub em segredo de CI (`DOCKERHUB_TOKEN`).
-- Usar `DOCKERHUB_USERNAME` como variavel de ambiente de CI.
+Script: `./scripts/release-local.sh`
 
-### 13.3 Comandos esperados
-- Build/push com profile:
-  - `./mvnw -Pjib-docker-build -DskipTests package`
-- Build com nome de imagem sobrescrito:
-  - `./mvnw -Pjib-docker-build -Ddocker.image=docker.io/fplima/fin-kids-api -DskipTests package`
+Comportamento do script:
+- valida formato da nova versao;
+- atualiza versao do `pom.xml`;
+- executa `./mvnw verify` (por padrao);
+- publica imagem no Docker Hub com profile `jib-docker-build`;
+- valida publicacao via `docker pull` das tags `nova-versao` e `latest`.
 
-### 13.4 Fluxo de pipeline (GitHub Actions)
-- Pull Request:
-  - executar `./mvnw verify`
-  - nao publicar imagem
-- `main` e tags de release:
-  - executar `./mvnw verify`
-  - autenticar no Docker Hub com secrets
-  - executar profile `jib-docker-build` para publicar imagem
-  - publicar tags: `${project.version}`, `latest` (e opcionalmente SHA curto)
+### 13.2 Como gerar uma nova versao
+
+1. Executar release local:
+   - `./scripts/release-local.sh 0.0.2`
+2. Opcional: sobrescrever nome da imagem:
+   - `DOCKER_IMAGE=docker.io/fplima/fin-kids-api ./scripts/release-local.sh 0.0.2`
+
+Opcoes uteis:
+- `--skip-tests`: nao roda `mvn verify` antes da publicacao.
+- `--no-pull`: nao executa validacao final com `docker pull`.
+- `--dry-run`: mostra comandos sem executar.
+- `--allow-dirty`: permite executar com workspace nao limpo.
+
+### 13.3 Teste do script de release
+
+Existe smoke test local para validar o comportamento do script:
+- `./scripts/test-release-local.sh`

@@ -10,7 +10,7 @@
     </parent>
     <groupId>br.com.autevia</groupId>
     <artifactId>fin-kids-api</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2</version>
     <name>fin-kids-api</name>
     <description>fin-kids-api</description>
     <url/>
@@ -29,6 +29,7 @@
     <properties>
         <java.version>21</java.version>
         <springdoc.version>3.0.0</springdoc.version>
+        <jib.version>3.5.1</jib.version>
     </properties>
     <dependencies>
         <dependency>
@@ -188,5 +189,65 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>jib-docker-build</id>
+            <properties>
+                <docker.image>docker.io/fplima/fin-kids-api</docker.image>
+                <docker.base.image>eclipse-temurin:21-jre</docker.base.image>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>${jib.version}</version>
+                        <configuration>
+                            <from>
+                                <image>${docker.base.image}</image>
+                                <platforms>
+                                    <platform>
+                                        <architecture>amd64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                    <platform>
+                                        <architecture>arm64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                </platforms>
+                            </from>
+                            <to>
+                                <image>${docker.image}</image>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
+                                </tags>
+                                <auth>
+                                    <username>fplima</username>
+                                    <password>bRaute@2025@</password>
+                                </auth>
+                            </to>
+                            <container>
+                                <mainClass>br.com.autevia.finkidsapi.FinKidsApiApplication</mainClass>
+                                <ports>
+                                    <port>8080</port>
+                                </ports>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>build-and-publish-image</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

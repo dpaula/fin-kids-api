@@ -177,6 +177,21 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - testes de controller para contrato e validacao
   - integracao HTTP cobrindo sucesso, `401`, `403`, `404`
 
+### 3.15 Entrega concluida
+- [x] Pipeline local de release Docker implementada (sem dependencia de GitHub Actions).
+- [x] Profile Maven `jib-docker-build` criado no `pom.xml` com:
+  - imagem destino `docker.io/fplima/fin-kids-api`
+  - build multi-arquitetura Linux (`amd64` + `arm64`)
+  - `mainClass` da API (`br.com.autevia.finkidsapi.FinKidsApiApplication`)
+  - publicacao de tags `${project.version}` e `latest`
+- [x] Credenciais de publicacao mantidas fora de codigo:
+  - **ajuste temporario de desenvolvimento**: credenciais Docker Hub hardcoded no profile do Jib
+- [x] Script versionado para release local:
+  - `scripts/release-local.sh`
+  - validacoes de versao, workspace, build/test e `docker pull` opcional
+- [x] Teste automatizado de smoke do script:
+  - `scripts/test-release-local.sh`
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -279,25 +294,25 @@ Objetivo: estabilidade, observabilidade e padrao de release.
 - [ ] Health checks e readiness/liveness ajustados.
 - [ ] Logs estruturados e rastreabilidade de erro.
 - [ ] Configuracao de metricas essenciais.
-- [ ] Pipeline CI com etapas minimas:
+- [ ] Pipeline CI com etapas minimas (opcional, sem publish de imagem):
   - build
   - testes
   - cobertura
   - validacao de migrations
-- [ ] Pipeline de imagem Docker com profile Maven (`jib-docker-build`):
+- [x] Pipeline de imagem Docker com profile Maven (`jib-docker-build`):
   - adicionar profile no `pom.xml` com `jib-maven-plugin`
   - configurar imagem destino `docker.io/fplima/fin-kids-api`
   - configurar build multi-arquitetura Linux (`amd64` + `arm64`)
   - configurar `mainClass` da API: `br.com.autevia.finkidsapi.FinKidsApiApplication`
   - configurar porta de container (default atual: `8080`)
-- [ ] Publicacao segura no Docker Hub via CI:
-  - autenticar via `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` (secrets)
-  - proibir credenciais hardcoded no `pom.xml`
+- [x] Publicacao local no Docker Hub via fluxo de desenvolvimento:
+  - autenticacao via credenciais hardcoded no profile Jib (escopo de desenvolvimento/teste)
   - publicar tags `latest` e `${project.version}`
-  - opcional: publicar tag por commit (`sha-curto`)
-- [ ] Regras de execucao da pipeline:
-  - Pull Request: executar `./mvnw verify` sem push de imagem
-  - branch `main` e tags de release: executar `verify` + push da imagem via profile Jib
+  - opcional: sobrescrever imagem destino com `DOCKER_IMAGE`
+- [x] Regras de execucao de release local:
+  - executar `./mvnw verify` antes do publish (default do script)
+  - publicar imagem via profile `jib-docker-build`
+  - validar push com `docker pull` da nova tag e `latest` (pode desativar com `--no-pull`)
 - [ ] Regra de qualidade:
   - build quebrado se teste falhar
   - build quebrado se cobertura minima nao for atingida
@@ -312,7 +327,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Definir e versionar workflow de pipeline Docker (Jib + Docker Hub) sem credenciais em codigo.
 - [ ] Isolar ambiente de testes/CI de banco externo e remover defaults sensiveis de credenciais.
 - [ ] Fechar pendencias de fundacao de banco:
   - checks de valores monetarios positivos
