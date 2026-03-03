@@ -208,6 +208,19 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Validacao local da entrega:
   - `./mvnw verify` com sucesso sem dependencia de MySQL remoto para testes
 
+### 3.17 Entrega concluida
+- [x] Endurecimento de integridade de dominio no banco via Liquibase:
+  - check `transactions.amount > 0`
+  - check `goals.target_amount > 0`
+  - check `bonus_rules.percentage` entre `0` e `100`
+- [x] Otimizacao de consulta para extrato/resumo com novos indices:
+  - `transactions(account_id, occurred_at, type)`
+  - `transactions(account_id, occurred_at, origin)`
+- [x] Testes automatizados de persistencia para validar rejeicao de dados invalidos por constraints de banco.
+- [x] Teste de migration em schema limpo cobrindo subida completa dos changesets e existencia dos artefatos de integridade.
+- [x] Validacao local da entrega:
+  - `./mvnw verify` com sucesso.
+
 ## 4) Roadmap detalhado por fases
 
 ## Fase 1 - Fundacao de dominio e persistencia
@@ -215,13 +228,13 @@ Objetivo: consolidar base tecnica e contrato minimo de dados.
 
 - [x] Configuracao de banco e migrations iniciais.
 - [x] Entidades e repositories base.
-- [ ] Modelagem de constraints adicionais no banco:
+- [x] Modelagem de constraints adicionais no banco:
   - checks de valores monetarios positivos
   - indices para consultas de extrato e resumo
 - [ ] Seeds opcionais para ambiente de desenvolvimento.
-- [ ] Testes automatizados da camada de persistencia:
+- [x] Testes automatizados da camada de persistencia:
   - [x] testes de repository
-  - testes de migration (subida limpa de schema)
+  - [x] testes de migration (subida limpa de schema)
 - [x] Cobertura alvo da fase: minimo 50% na camada de dominio/persistencia.
 
 ## Fase 2 - Regras de negocio core
@@ -344,6 +357,6 @@ Um item so pode ser marcado como concluido quando:
 - item marcado neste `roadmapcronograma.md`
 
 ## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Fechar pendencias de fundacao de banco:
-  - checks de valores monetarios positivos
-  - testes de migration de subida limpa do schema
+- [ ] Seeds opcionais para ambiente de desenvolvimento:
+  - carga inicial segura apenas em profile `dev`
+  - dados minimos para conta, usuarios e vinculos para acelerar testes manuais

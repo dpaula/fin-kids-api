@@ -22,6 +22,12 @@ Authorization model by account:
 - `PARENT`: read and write operations
 - Role lookup source: `account_users.profile_role`
 
+Database integrity guarantees (Liquibase):
+- `transactions.amount` must be `> 0`
+- `goals.target_amount` must be `> 0`
+- `bonus_rules.percentage` must be between `0` and `100`
+- Unique idempotency key for evidence: `transactions(account_id, origin, evidence_reference)`
+
 ## 2) Enums
 
 ### TransactionType

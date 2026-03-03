@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-add-positive-checks-and-summary-indexes
+      author: codex
+      changes:
+        - sql:
+            splitStatements: true
+            stripComments: true
+            sql: |
+              ALTER TABLE transactions
+                ADD CONSTRAINT ck_transactions_amount_positive CHECK (amount > 0);
+
+              ALTER TABLE goals
+                ADD CONSTRAINT ck_goals_target_amount_positive CHECK (target_amount > 0);
+
+              ALTER TABLE bonus_rules
+                ADD CONSTRAINT ck_bonus_rules_percentage_range CHECK (percentage >= 0 AND percentage <= 100);
+
+        - createIndex:
+            indexName: idx_transactions_account_occurred_type
+            tableName: transactions
+            columns:
+              - column:
+                  name: account_id
+              - column:
+                  name: occurred_at
+              - column:
+                  name: type
+
+        - createIndex:
+            indexName: idx_transactions_account_occurred_origin
+            tableName: transactions
+            columns:
+              - column:
+                  name: account_id
+              - column:
+                  name: occurred_at
+              - column:
+                  name: origin
