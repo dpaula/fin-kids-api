@@ -20,9 +20,27 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - validacao local (build/test)
 - Este arquivo deve ser atualizado a cada nova feature concluida.
 
-## 3) Status atual do projeto
+## 3) Painel de progresso (funcional x nao funcional)
 
-### 3.1 Entregas concluidas
+Classificacao adotada:
+- **Funcional**: atividades que entregam comportamento de negocio e contratos de uso da API.
+- **Nao funcional**: atividades de qualidade, seguranca, operacao, observabilidade e entrega.
+
+Separacao por fase:
+- Funcional: Fases 1, 2, 3, 5 e 6.
+- Nao funcional: Fases 4 e 7.
+
+Percentual consolidado (base: itens de primeiro nivel das fases):
+- Funcional: **31/37 concluidos (83.8%)**
+- Nao funcional: **13/18 concluidos (72.2%)**
+- Geral do roadmap: **44/55 concluidos (80.0%)**
+
+Regra de atualizacao desta secao:
+- Ao marcar/desmarcar qualquer item nas fases, atualizar imediatamente os 3 percentuais acima.
+
+## 4) Status atual do projeto
+
+### 4.1 Entregas concluidas
 - [x] Estrutura base do projeto Spring Boot 4 + Java 21 pronta.
 - [x] Dependencias de persistencia adicionadas:
   - Spring Data JPA
@@ -45,25 +63,25 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Repositories JPA iniciais criados.
 - [x] Teste automatizado de contexto executado com sucesso (`./mvnw test -Dspring.profiles.active=dev`).
 
-### 3.2 Entrega concluida
+### 4.2 Entrega concluida
 - [x] Camada de servicos de dominio para regras de transacao (entrada/saida e saldo nao negativo).
 - [x] Primeiros endpoints REST de transacoes.
 
-### 3.3 Entrega concluida
+### 4.3 Entrega concluida
 - [x] Endpoints de conta/resumo para saldo atual e resumo mensal.
 - [x] Testes automatizados da camada de resumo (servico + controller).
 
-### 3.4 Entrega concluida
+### 4.4 Entrega concluida
 - [x] CRUD inicial de metas (criar/listar/atualizar/remover com exclusao logica).
 - [x] Testes automatizados de metas (servico + controller).
 
-### 3.5 Entrega concluida
+### 4.5 Entrega concluida
 - [x] Validacao de payload e parametros com Bean Validation nos controllers/DTOs.
 - [x] Tratamento padronizado de erros de validacao HTTP 400 no `ApiExceptionHandler`.
 - [x] Cobertura automatizada com JaCoCo no build (`verify`) com regra minima aplicada.
 - [x] Testes de repositorio para consultas agregadas de saldo/resumo mensal.
 
-### 3.6 Entrega concluida
+### 4.6 Entrega concluida
 - [x] Endpoints de regra de bonus implementados:
   - `GET /api/v1/accounts/{accountId}/bonus-rule`
   - `PUT /api/v1/accounts/{accountId}/bonus-rule`
@@ -72,7 +90,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Testes automatizados da entrega (servico + controller) com cenarios de sucesso e erro.
 - [x] Gate de cobertura elevado para classes core de servico/controller (>= 80% no JaCoCo check).
 
-### 3.7 Entrega concluida
+### 4.7 Entrega concluida
 - [x] Testes de integracao end-to-end do fluxo de transacao via HTTP (`POST /transactions`).
 - [x] Validacao de persistencia real do fluxo:
   - deposito bem-sucedido
@@ -82,7 +100,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - payload invalido (`400`)
   - conta inexistente (`404`)
 
-### 3.8 Entrega concluida
+### 4.8 Entrega concluida
 - [x] Publicacao da documentacao tecnica OpenAPI/Swagger da API v1.
 - [x] Configuracao central do OpenAPI com metadados e schema de erro padrao.
 - [x] Anotacao dos controllers e DTOs principais para contrato documentado.
@@ -90,7 +108,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - `GET /v3/api-docs`
   - `GET /swagger-ui/index.html`
 
-### 3.9 Entrega concluida
+### 4.9 Entrega concluida
 - [x] Endpoint seguro de automacao implementado:
   - `POST /api/v1/automation/transactions`
 - [x] Autenticacao por token dedicado para chamadas n8n/WhatsApp (`Authorization: Bearer <token>`).
@@ -103,7 +121,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - conta inexistente (`404`)
   - saldo insuficiente (`422`)
 
-### 3.10 Entrega concluida
+### 4.10 Entrega concluida
 - [x] Idempotencia de transacoes por evidencia implementada no fluxo de automacao.
 - [x] Constraint de unicidade em banco adicionada via Liquibase para evitar duplicidade:
   - `transactions(account_id, origin, evidence_reference)`
@@ -114,7 +132,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - controller test para mapeamento HTTP `409`
   - integracao de automacao com tentativa duplicada de mesma evidencia
 
-### 3.11 Entrega concluida
+### 4.11 Entrega concluida
 - [x] Estrutura de autenticacao de usuario via JWT (OAuth2 Resource Server) implementada.
 - [x] Compatibilidade com login Google do WebApp considerada no contrato tecnico:
   - API validando JWT por `issuer-uri` configuravel (`JWT_ISSUER_URI`)
@@ -133,7 +151,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - cenarios de leitura permitida para crianca
   - regressao dos fluxos existentes com autenticacao valida
 
-### 3.12 Entrega concluida
+### 4.12 Entrega concluida
 - [x] Endpoint de contexto de sessao para WebApp implementado:
   - `GET /api/v1/users/me`
 - [x] Contrato de sessao entregue com:
@@ -147,7 +165,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - integracao HTTP cobrindo `200`, `401` e `404`
   - regressao do teste de documentacao OpenAPI para novo endpoint
 
-### 3.13 Entrega concluida
+### 4.13 Entrega concluida
 - [x] Trilha de auditoria para alteracoes sensiveis implementada.
 - [x] Persistencia de eventos de auditoria via tabela dedicada `audit_events` com indices para consultas por conta e tempo.
 - [x] Auditoria aplicada nos fluxos sensiveis:
@@ -162,7 +180,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - integracao HTTP validando criacao de eventos auditaveis
   - garantia de nao auditoria para endpoint de automacao
 
-### 3.14 Entrega concluida
+### 4.14 Entrega concluida
 - [x] Endpoint administrativo para gestao de vinculos usuario-conta implementado:
   - `GET /api/v1/accounts/{accountId}/user-links`
   - `PUT /api/v1/accounts/{accountId}/user-links/{userId}`
@@ -177,7 +195,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
   - testes de controller para contrato e validacao
   - integracao HTTP cobrindo sucesso, `401`, `403`, `404`
 
-### 3.15 Entrega concluida
+### 4.15 Entrega concluida
 - [x] Pipeline local de release Docker implementada (sem dependencia de GitHub Actions).
 - [x] Profile Maven `jib-docker-build` criado no `pom.xml` com:
   - imagem destino `docker.io/fplima/fin-kids-api`
@@ -192,7 +210,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Teste automatizado de smoke do script:
   - `scripts/test-release-local.sh`
 
-### 3.16 Entrega concluida
+### 4.16 Entrega concluida
 - [x] Ambiente de testes isolado de banco externo implementado com profile dedicado:
   - `application-test.yaml` com datasource via Testcontainers JDBC (`jdbc:tc:mysql:8.4.0`)
   - token de automacao de teste e `jwk-set-uri` de teste para evitar dependencias externas em bootstrap
@@ -208,7 +226,7 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Validacao local da entrega:
   - `./mvnw verify` com sucesso sem dependencia de MySQL remoto para testes
 
-### 3.17 Entrega concluida
+### 4.17 Entrega concluida
 - [x] Endurecimento de integridade de dominio no banco via Liquibase:
   - check `transactions.amount > 0`
   - check `goals.target_amount > 0`
@@ -221,9 +239,11 @@ Este documento controla o plano de execucao do projeto **somente da API** deste 
 - [x] Validacao local da entrega:
   - `./mvnw verify` com sucesso.
 
-## 4) Roadmap detalhado por fases
+## 5) Roadmap detalhado por fases
 
-## Fase 1 - Fundacao de dominio e persistencia
+### 5.1 Atividades funcionais (regras de negocio e contrato de API)
+
+## Fase 1 - Fundacao de dominio e persistencia [FUNCIONAL]
 Objetivo: consolidar base tecnica e contrato minimo de dados.
 
 - [x] Configuracao de banco e migrations iniciais.
@@ -237,7 +257,7 @@ Objetivo: consolidar base tecnica e contrato minimo de dados.
   - [x] testes de migration (subida limpa de schema)
 - [x] Cobertura alvo da fase: minimo 50% na camada de dominio/persistencia.
 
-## Fase 2 - Regras de negocio core
+## Fase 2 - Regras de negocio core [FUNCIONAL]
 Objetivo: implementar comportamento principal do produto.
 
 - [x] Caso de uso: criar transacao `DEPOSIT`.
@@ -256,7 +276,7 @@ Objetivo: implementar comportamento principal do produto.
 - [x] Testes de integracao de fluxo completo de transacao (servico + persistencia + HTTP)
 - [x] Cobertura alvo da fase: minimo 65% do dominio core.
 
-## Fase 3 - API REST v1
+## Fase 3 - API REST v1 [FUNCIONAL]
 Objetivo: entregar endpoints para consumo inicial do front e integracoes.
 
 - [x] Endpoints de conta/resumo:
@@ -270,12 +290,38 @@ Objetivo: entregar endpoints para consumo inicial do front e integracoes.
 - [x] Validacao de payload (Bean Validation + mensagens claras).
 - [x] Padrao de resposta HTTP e contrato de erro.
 - [x] Documentacao tecnica inicial da API (OpenAPI/Swagger).
-- [ ] Testes automatizados obrigatorios:
+- [x] Testes automatizados obrigatorios:
   - integracao de controllers
   - testes de contrato dos endpoints principais
 - [x] Cobertura alvo da fase: minimo 70% em servicos e controllers core.
 
-## Fase 4 - Seguranca e autorizacao
+## Fase 5 - Integração de automacao (contrato API) [FUNCIONAL]
+Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
+
+- [x] Endpoint de ingestao de transacao automatizada com origem `WHATSAPP`.
+- [x] Suporte a evidencia da transacao (id/hash/url interna).
+- [x] Regras de idempotencia para evitar duplicidade.
+- [x] Mensagens de retorno para integracao (sucesso/erro de negocio).
+- [x] Testes automatizados obrigatorios:
+  - [x] integracao do endpoint de automacao
+  - [x] cenarios de duplicidade e saldo insuficiente
+- [x] Cobertura alvo da fase: minimo 75% nos fluxos de automacao.
+
+## Fase 6 - Metas e bonus educacional (MVP expandido) [FUNCIONAL]
+Objetivo: habilitar recursos educacionais previstos no produto.
+
+- [x] Regras de bonus configuraveis por conta (consulta/upsert da regra por conta).
+- [ ] Execucao de bonus (job/agendamento) com trilha auditavel.
+- [ ] Evolucao de metas com progresso por saldo.
+- [ ] Endpoints de consulta para tela crianca e pais.
+- [ ] Testes automatizados obrigatorios:
+  - unitarios das regras de bonus
+  - integracao de metas e progresso
+- [ ] Cobertura alvo da fase: minimo 80% dos modulos de bonus/metas.
+
+### 5.2 Atividades nao funcionais (qualidade, seguranca, operacao e entrega)
+
+## Fase 4 - Seguranca e autorizacao [NAO FUNCIONAL]
 Objetivo: proteger API por perfil de usuario e integracao automatizada.
 
 - [x] Estrutura de autenticacao (JWT/OAuth2 resource server, conforme decisao de arquitetura).
@@ -293,31 +339,7 @@ Objetivo: proteger API por perfil de usuario e integracao automatizada.
   - [x] testes de endpoint de automacao
 - [x] Cobertura alvo da fase: minimo 75% em regras de seguranca e acesso.
 
-## Fase 5 - Integração de automacao (contrato API)
-Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
-
-- [x] Endpoint de ingestao de transacao automatizada com origem `WHATSAPP`.
-- [x] Suporte a evidencia da transacao (id/hash/url interna).
-- [x] Regras de idempotencia para evitar duplicidade.
-- [x] Mensagens de retorno para integracao (sucesso/erro de negocio).
-- [x] Testes automatizados obrigatorios:
-  - [x] integracao do endpoint de automacao
-  - [x] cenarios de duplicidade e saldo insuficiente
-- [ ] Cobertura alvo da fase: minimo 75% nos fluxos de automacao.
-
-## Fase 6 - Metas e bonus educacional (MVP expandido)
-Objetivo: habilitar recursos educacionais previstos no produto.
-
-- [x] Regras de bonus configuraveis por conta (consulta/upsert da regra por conta).
-- [ ] Execucao de bonus (job/agendamento) com trilha auditavel.
-- [ ] Evolucao de metas com progresso por saldo.
-- [ ] Endpoints de consulta para tela crianca e pais.
-- [ ] Testes automatizados obrigatorios:
-  - unitarios das regras de bonus
-  - integracao de metas e progresso
-- [ ] Cobertura alvo da fase: minimo 80% dos modulos de bonus/metas.
-
-## Fase 7 - Qualidade operacional e preparo para producao
+## Fase 7 - Qualidade operacional e preparo para producao [NAO FUNCIONAL]
 Objetivo: estabilidade, observabilidade e padrao de release.
 
 - [ ] Health checks e readiness/liveness ajustados.
@@ -343,12 +365,12 @@ Objetivo: estabilidade, observabilidade e padrao de release.
   - executar `./mvnw verify` antes do publish (default do script)
   - publicar imagem via profile `jib-docker-build`
   - validar push com `docker pull` da nova tag e `latest` (pode desativar com `--no-pull`)
-- [ ] Regra de qualidade:
+- [x] Regra de qualidade:
   - build quebrado se teste falhar
   - build quebrado se cobertura minima nao for atingida
 - [ ] Documentacao de deploy e rollback de banco.
 
-## 5) Definicao de pronto (Definition of Done)
+## 6) Definicao de pronto (Definition of Done)
 Um item so pode ser marcado como concluido quando:
 - codigo implementado e revisado
 - testes automatizados adicionados/atualizados e passando
@@ -356,7 +378,9 @@ Um item so pode ser marcado como concluido quando:
 - documentacao tecnica atualizada (quando aplicavel)
 - item marcado neste `roadmapcronograma.md`
 
-## 6) Proxima entrega recomendada (curto prazo)
-- [ ] Seeds opcionais para ambiente de desenvolvimento:
-  - carga inicial segura apenas em profile `dev`
-  - dados minimos para conta, usuarios e vinculos para acelerar testes manuais
+## 7) Proxima entrega recomendada (curto prazo)
+- [ ] Prioridade funcional:
+  - executar bonus por agendamento com trilha auditavel
+  - cobrir regra com testes unitarios e integracao
+- [ ] Prioridade nao funcional:
+  - health/readiness/liveness para operacao local e futura producao
