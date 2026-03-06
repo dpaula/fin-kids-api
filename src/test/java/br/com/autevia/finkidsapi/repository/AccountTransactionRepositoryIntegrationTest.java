@@ -72,6 +72,53 @@ class AccountTransactionRepositoryIntegrationTest {
         assertThat(byOrigin.get(TransactionOrigin.BONUS)).isNull();
     }
 
+    @Test
+    void shouldProvideReferenceQueriesForBonusExecution() {
+        Account account = accountRepository.save(new Account("Lia", "BRL"));
+
+        saveTransaction(account, TransactionType.DEPOSIT, TransactionOrigin.MANUAL, "100.00", "Mesada", "2026-02-02T10:00:00Z");
+        saveTransaction(account, TransactionType.DEPOSIT, TransactionOrigin.WHATSAPP, "50.00", "Pix", "2026-02-20T10:00:00Z");
+        saveTransaction(account, TransactionType.DEPOSIT, TransactionOrigin.BONUS, "5.00", "Bonus antigo", "2026-02-25T10:00:00Z");
+        saveTransaction(account, TransactionType.WITHDRAW, TransactionOrigin.MANUAL, "20.00", "Compra", "2026-01-15T10:00:00Z");
+
+        Instant start = Instant.parse("2026-02-01T00:00:00Z");
+        Instant end = Instant.parse("2026-03-01T00:00:00Z");
+
+        boolean hasWithdrawalsInMonth = accountTransactionRepository
+                .existsByAccountIdAndTypeAndOccurredAtGreaterThanEqualAndOccurredAtLessThan(
+                        account.getId(),
+                        TransactionType.WITHDRAW,
+                        start,
+                        end
+                );
+
+        AccountTransaction lastAllowance = accountTransactionRepository
+                .findTopByAccountIdAndTypeAndOriginNotAndOccurredAtGreaterThanEqualAndOccurredAtLessThanOrderByOccurredAtDesc(
+                        account.getId(),
+                        TransactionType.DEPOSIT,
+                        TransactionOrigin.BONUS,
+                        start,
+                        end
+                );
+
+        BigDecimal monthlyDeposits = accountTransactionRepository
+                .sumAmountByAccountIdAndTypeAndOccurredAtGreaterThanEqualAndOccurredAtLessThan(
+                        account.getId(),
+                        TransactionType.DEPOSIT,
+                        start,
+                        end
+                );
+
+        BigDecimal monthEndBalance = accountTransactionRepository
+                .calculateBalanceByAccountIdBefore(account.getId(), end);
+
+        assertThat(hasWithdrawalsInMonth).isFalse();
+        assertThat(lastAllowance).isNotNull();
+        assertThat(lastAllowance.getAmount()).isEqualByComparingTo("50.00");
+        assertThat(monthlyDeposits).isEqualByComparingTo("155.00");
+        assertThat(monthEndBalance).isEqualByComparingTo("135.00");
+    }
+
     private void saveTransaction(
             Account account,
             TransactionType type,

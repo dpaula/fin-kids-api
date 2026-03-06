@@ -15,3 +15,11 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+app:
+  bonus:
+    execution:
+      enabled: ${BONUS_EXECUTION_ENABLED:false}
+      cron: ${BONUS_EXECUTION_CRON:0 5 0 1 * *}
+      zone: ${BONUS_EXECUTION_ZONE:UTC}
+      actor-email: ${BONUS_EXECUTION_ACTOR_EMAIL:system.bonus@granagalaxy.local}

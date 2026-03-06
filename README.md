@@ -91,6 +91,10 @@ Primeira evolucao planejada, ja prevista na modelagem.
   - bonus mensal baseado em "sem gastos no mes"
   - percentual configuravel pelos pais (ex.: 5%, 10%)
   - regra de base explicita (ultimo saldo, ultima mesada ou soma de depositos do mes)
+- Status tecnico atual da API:
+  - execucao automatizada mensal implementada por job agendado
+  - idempotencia por mes via evidencia tecnica (`bonus:YYYY-MM`)
+  - trilha de auditoria para cada bonus aplicado (`BONUS_APPLIED`)
 
 ### 3.5 Metas e progresso
 - Uma meta tem:
@@ -236,6 +240,17 @@ Regra:
 1. Bonus por guardar (configuravel)
 2. Metas com progresso mais rico
 3. Relatorios mensais
+
+Status atual:
+- item 1 ja entregue na API com configuracao da regra + execucao agendada + auditoria.
+
+## 12) Configuracoes de bonus agendado
+
+Variaveis de ambiente da execucao automatica:
+- `BONUS_EXECUTION_ENABLED` (default `false`)
+- `BONUS_EXECUTION_CRON` (default `0 5 0 1 * *`)
+- `BONUS_EXECUTION_ZONE` (default `UTC`)
+- `BONUS_EXECUTION_ACTOR_EMAIL` (default `system.bonus@granagalaxy.local`)
 
 ## 9) Criterios de qualidade (nao negociaveis)
 

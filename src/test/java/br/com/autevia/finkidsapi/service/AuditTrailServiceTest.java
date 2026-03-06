@@ -13,6 +13,7 @@ import br.com.autevia.finkidsapi.domain.enums.AuditActionType;
 import br.com.autevia.finkidsapi.domain.enums.AuditResourceType;
 import br.com.autevia.finkidsapi.domain.enums.UserRole;
 import br.com.autevia.finkidsapi.domain.exception.UnauthorizedException;
+import br.com.autevia.finkidsapi.domain.exception.ValidationException;
 import br.com.autevia.finkidsapi.repository.AccountRepository;
 import br.com.autevia.finkidsapi.repository.AppUserRepository;
 import br.com.autevia.finkidsapi.repository.AuditEventRepository;
@@ -134,6 +135,47 @@ class AuditTrailServiceTest {
         assertThat(saved.getActorUser()).isNull();
         assertThat(saved.getActorGlobalRole()).isNull();
         assertThat(saved.getPayloadSummary()).isNull();
+    }
+
+    @Test
+    void shouldPersistSystemAuditEventWithoutAuthenticatedUser() {
+        Long accountId = 3L;
+        String actorEmail = "system.bonus@test.local";
+        Account account = new Account("Theo", "BRL");
+        ReflectionTestUtils.setField(account, "id", accountId);
+
+        when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+        when(appUserRepository.findByEmail(actorEmail)).thenReturn(Optional.empty());
+        when(auditEventRepository.save(any(AuditEvent.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        auditTrailService.recordSystem(new AuditRecordCommand(
+                accountId,
+                AuditActionType.BONUS_APPLIED,
+                AuditResourceType.TRANSACTION,
+                55L,
+                "referenceMonth=2026-02"
+        ), actorEmail);
+
+        ArgumentCaptor<AuditEvent> captor = ArgumentCaptor.forClass(AuditEvent.class);
+        verify(auditEventRepository).save(captor.capture());
+        AuditEvent saved = captor.getValue();
+        assertThat(saved.getActorEmail()).isEqualTo(actorEmail);
+        assertThat(saved.getActorUser()).isNull();
+        assertThat(saved.getActionType()).isEqualTo(AuditActionType.BONUS_APPLIED);
+        assertThat(saved.getResourceType()).isEqualTo(AuditResourceType.TRANSACTION);
+    }
+
+    @Test
+    void shouldRejectBlankSystemActorEmail() {
+        assertThatThrownBy(() -> auditTrailService.recordSystem(new AuditRecordCommand(
+                1L,
+                AuditActionType.BONUS_APPLIED,
+                AuditResourceType.TRANSACTION,
+                1L,
+                "payload"
+        ), " "))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("actorEmail");
     }
 
     private void setJwtAuthentication(String email) {

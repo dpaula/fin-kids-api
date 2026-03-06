@@ -31,9 +31,9 @@ Separacao por fase:
 - Nao funcional: Fases 4 e 7.
 
 Percentual consolidado (base: itens de primeiro nivel das fases):
-- Funcional: **31/37 concluidos (83.8%)**
+- Funcional: **32/37 concluidos (86.5%)**
 - Nao funcional: **13/18 concluidos (72.2%)**
-- Geral do roadmap: **44/55 concluidos (80.0%)**
+- Geral do roadmap: **45/55 concluidos (81.8%)**
 
 Regra de atualizacao desta secao:
 - Ao marcar/desmarcar qualquer item nas fases, atualizar imediatamente os 3 percentuais acima.
@@ -239,6 +239,28 @@ Regra de atualizacao desta secao:
 - [x] Validacao local da entrega:
   - `./mvnw verify` com sucesso.
 
+### 4.18 Entrega concluida
+- [x] Execucao automatizada de bonus mensal implementada em servico dedicado.
+- [x] Agendamento configuravel com cron implementado para processar o mes de referencia anterior.
+- [x] Regra de elegibilidade aplicada na execucao:
+  - conta sem `WITHDRAW` no mes
+  - regra de bonus ativa
+  - idempotencia mensal por evidencia (`bonus:YYYY-MM`)
+- [x] Base de calculo implementada para todos os modos configurados:
+  - `LAST_BALANCE`
+  - `LAST_ALLOWANCE` (ignora origem `BONUS` para ultima mesada)
+  - `MONTHLY_DEPOSITS`
+- [x] Trilha de auditoria de sistema para bonus aplicado:
+  - `audit_events.action_type = BONUS_APPLIED`
+  - `actor_email` tecnico configuravel por propriedade
+- [x] Testes automatizados da entrega:
+  - unitarios do servico de execucao
+  - unitario do scheduler
+  - integracao do fluxo de execucao + auditoria
+  - repositorio com queries de suporte ao bonus
+- [x] Validacao local da entrega:
+  - `./mvnw verify` com sucesso.
+
 ## 5) Roadmap detalhado por fases
 
 ### 5.1 Atividades funcionais (regras de negocio e contrato de API)
@@ -311,11 +333,11 @@ Objetivo: suportar fluxo n8n/WhatsApp sem dependencia acoplada.
 Objetivo: habilitar recursos educacionais previstos no produto.
 
 - [x] Regras de bonus configuraveis por conta (consulta/upsert da regra por conta).
-- [ ] Execucao de bonus (job/agendamento) com trilha auditavel.
+- [x] Execucao de bonus (job/agendamento) com trilha auditavel.
 - [ ] Evolucao de metas com progresso por saldo.
 - [ ] Endpoints de consulta para tela crianca e pais.
 - [ ] Testes automatizados obrigatorios:
-  - unitarios das regras de bonus
+  - [x] unitarios das regras de bonus e agendamento
   - integracao de metas e progresso
 - [ ] Cobertura alvo da fase: minimo 80% dos modulos de bonus/metas.
 
@@ -380,7 +402,7 @@ Um item so pode ser marcado como concluido quando:
 
 ## 7) Proxima entrega recomendada (curto prazo)
 - [ ] Prioridade funcional:
-  - executar bonus por agendamento com trilha auditavel
-  - cobrir regra com testes unitarios e integracao
+  - evoluir metas com progresso por saldo (modelo + servico + endpoint de consulta)
+  - incluir testes de integracao de metas/progresso para fechar pendencia da fase 6
 - [ ] Prioridade nao funcional:
   - health/readiness/liveness para operacao local e futura producao

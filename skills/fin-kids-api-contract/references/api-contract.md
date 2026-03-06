@@ -28,6 +28,13 @@ Database integrity guarantees (Liquibase):
 - `bonus_rules.percentage` must be between `0` and `100`
 - Unique idempotency key for evidence: `transactions(account_id, origin, evidence_reference)`
 
+Background execution (no HTTP endpoint):
+- Monthly bonus job can be enabled by configuration (`BONUS_EXECUTION_ENABLED=true`)
+- Scheduler calculates bonus for previous month (`referenceMonth = now(zone) - 1 month`)
+- Applies only when account has active rule and no `WITHDRAW` in the reference month
+- Persists a `DEPOSIT` with origin `BONUS` and evidence `bonus:YYYY-MM` (idempotent by month)
+- Records audit trail event with action `BONUS_APPLIED`
+
 ## 2) Enums
 
 ### TransactionType

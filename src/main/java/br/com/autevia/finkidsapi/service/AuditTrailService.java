@@ -38,16 +38,36 @@ public class AuditTrailService {
     public void record(AuditRecordCommand command) {
         validateCommand(command);
         AuthenticatedActor actor = resolveAuthenticatedActor();
+        persistEvent(command, actor.user(), actor.email(), actor.globalRole());
+    }
 
+    @Transactional
+    public void recordSystem(AuditRecordCommand command, String actorEmail) {
+        validateCommand(command);
+        if (actorEmail == null || actorEmail.isBlank()) {
+            throw new ValidationException("actorEmail do sistema e obrigatorio para auditoria.");
+        }
+        String normalizedEmail = actorEmail.trim();
+        AppUser actorUser = appUserRepository.findByEmail(normalizedEmail).orElse(null);
+        UserRole actorGlobalRole = actorUser == null ? null : actorUser.getRole();
+        persistEvent(command, actorUser, normalizedEmail, actorGlobalRole);
+    }
+
+    private void persistEvent(
+            AuditRecordCommand command,
+            AppUser actorUser,
+            String actorEmail,
+            UserRole actorGlobalRole
+    ) {
         Account account = accountRepository.findById(command.accountId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Conta nao encontrada para id=" + command.accountId()));
 
         AuditEvent event = new AuditEvent(
                 account,
-                actor.user(),
-                actor.email(),
-                actor.globalRole(),
+                actorUser,
+                actorEmail,
+                actorGlobalRole,
                 command.actionType(),
                 command.resourceType(),
                 command.resourceId(),
