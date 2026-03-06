@@ -138,6 +138,8 @@ Objetivo deste modulo:
 ### Conta / Resumo
 - consultar saldo atual e dados principais da conta
 - consultar resumo por mes e por origem
+- consultar visao consolidada da crianca (saldo + metas com progresso + historico simplificado)
+- consultar visao consolidada dos pais (saldo + resumo mensal + bonus + metas + historico detalhado)
 
 ### Transacoes
 - criar transacao (entrada/saida)
@@ -198,7 +200,7 @@ Este modulo nao vive neste repositorio, mas guia necessidades de API.
 - saldo atual em destaque
 - grafico de pizza (participacao de depositos por origem)
 - crescimento mensal
-- metas com barra de progresso
+- metas com barra de progresso baseada no saldo atual
 - historico simplificado com icones de entrada/saida
 
 Regra:

@@ -441,9 +441,149 @@ Common errors:
 
 ---
 
-## 8) Bonus Rule API
+## 8) Account Views API
 
-### 7.1 Get bonus rule by account
+### 8.1 Get child account view
+
+- Method: `GET`
+- Path: `/api/v1/accounts/{accountId}/child-view`
+
+Path params:
+- `accountId` (required, number, `> 0`)
+
+Query params:
+- `recentTransactionsLimit` (optional, integer between `1` and `50`, default `10`)
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "accountId": 1,
+  "childName": "Lucas",
+  "currencyCode": "BRL",
+  "currentBalance": 130.00,
+  "goals": [
+    {
+      "goalId": 11,
+      "name": "Bicicleta",
+      "targetAmount": 200.00,
+      "progressAmount": 130.00,
+      "progressPercent": 65.00,
+      "remainingAmount": 70.00,
+      "achieved": false
+    }
+  ],
+  "recentTransactions": [
+    {
+      "transactionId": 101,
+      "type": "WITHDRAW",
+      "amount": 20.00,
+      "description": "Lanche",
+      "occurredAt": "2026-03-06T10:00:00Z"
+    }
+  ]
+}
+```
+
+Goal progress rule:
+- `progressAmount = min(currentBalance, targetAmount)`
+- `progressPercent = (progressAmount / targetAmount) * 100` rounded to 2 decimals (max `100`)
+- `remainingAmount = max(targetAmount - progressAmount, 0)`
+- `achieved = remainingAmount == 0`
+
+Common errors:
+- `400` invalid params (`accountId` or `recentTransactionsLimit`)
+- `401` missing/invalid user JWT
+- `403` user without read permission on target account
+- `404` account not found
+
+### 8.2 Get parent account view
+
+- Method: `GET`
+- Path: `/api/v1/accounts/{accountId}/parent-view`
+
+Path params:
+- `accountId` (required, number, `> 0`)
+
+Query params:
+- `year` (required, integer between `2000` and `2100`)
+- `month` (required, integer between `1` and `12`)
+- `recentTransactionsLimit` (optional, integer between `1` and `50`, default `20`)
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "accountId": 1,
+  "childName": "Nina",
+  "currencyCode": "BRL",
+  "currentBalance": 70.00,
+  "monthlySummary": {
+    "year": 2026,
+    "month": 3,
+    "periodStart": "2026-03-01T00:00:00Z",
+    "periodEnd": "2026-04-01T00:00:00Z",
+    "totalDeposits": 110.00,
+    "totalWithdrawals": 40.00,
+    "netChange": 70.00,
+    "totalsByType": [
+      { "type": "DEPOSIT", "total": 110.00 },
+      { "type": "WITHDRAW", "total": 40.00 }
+    ],
+    "totalsByOrigin": [
+      { "origin": "MANUAL", "total": 100.00 },
+      { "origin": "BONUS", "total": 10.00 },
+      { "origin": "WHATSAPP", "total": 40.00 }
+    ]
+  },
+  "bonusRule": {
+    "percentage": 5.00,
+    "conditionType": "NO_WITHDRAWALS_IN_MONTH",
+    "baseType": "MONTHLY_DEPOSITS",
+    "active": true
+  },
+  "goals": [
+    {
+      "goalId": 21,
+      "name": "Patins",
+      "targetAmount": 150.00,
+      "progressAmount": 70.00,
+      "progressPercent": 46.67,
+      "remainingAmount": 80.00,
+      "achieved": false
+    }
+  ],
+  "recentTransactions": [
+    {
+      "transactionId": 501,
+      "type": "DEPOSIT",
+      "origin": "BONUS",
+      "amount": 10.00,
+      "description": "Bonus",
+      "evidenceReference": "bonus:2026-03",
+      "occurredAt": "2026-03-15T10:00:00Z"
+    }
+  ]
+}
+```
+
+Notes:
+- `bonusRule` can be `null` when account has no configured bonus rule.
+- `monthlySummary` follows the same monthly window rule used by `/monthly-summary`.
+
+Common errors:
+- `400` invalid params (`accountId`, `year`, `month`, `recentTransactionsLimit`)
+- `401` missing/invalid user JWT
+- `403` user without read permission on target account
+- `404` account not found
+
+---
+
+## 9) Bonus Rule API
+
+### 9.1 Get bonus rule by account
 
 - Method: `GET`
 - Path: `/api/v1/accounts/{accountId}/bonus-rule`
@@ -473,7 +613,7 @@ Common errors:
 - `403` user without write permission on target account
 - `404` account not found or bonus rule not configured for account
 
-### 7.2 Create or update bonus rule (upsert)
+### 9.2 Create or update bonus rule (upsert)
 
 - Method: `PUT`
 - Path: `/api/v1/accounts/{accountId}/bonus-rule`
@@ -514,9 +654,9 @@ Common errors:
 
 ---
 
-## 9) Users API
+## 10) Users API
 
-### 9.1 Get current authenticated user context
+### 10.1 Get current authenticated user context
 
 - Method: `GET`
 - Path: `/api/v1/users/me`
@@ -563,9 +703,9 @@ Common errors:
 
 ---
 
-## 10) Account User Links API
+## 11) Account User Links API
 
-### 10.1 List user links by account
+### 11.1 List user links by account
 
 - Method: `GET`
 - Path: `/api/v1/accounts/{accountId}/user-links`
@@ -603,7 +743,7 @@ Common errors:
 - `403` user without administrative permission on target account
 - `404` account not found
 
-### 10.2 Create or update account-user link (upsert)
+### 11.2 Create or update account-user link (upsert)
 
 - Method: `PUT`
 - Path: `/api/v1/accounts/{accountId}/user-links/{userId}`
@@ -643,7 +783,7 @@ Common errors:
 
 ---
 
-## 11) Audit Trail (Internal)
+## 12) Audit Trail (Internal)
 
 The API persists audit events for sensitive user writes in `audit_events`.
 
@@ -670,7 +810,7 @@ Notes:
 
 ---
 
-## 12) Maintenance Checklist
+## 13) Maintenance Checklist
 
 When adding or changing any controller/endpoint:
 

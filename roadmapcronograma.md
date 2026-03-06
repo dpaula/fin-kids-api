@@ -31,9 +31,9 @@ Separacao por fase:
 - Nao funcional: Fases 4 e 7.
 
 Percentual consolidado (base: itens de primeiro nivel das fases):
-- Funcional: **32/37 concluidos (86.5%)**
+- Funcional: **36/37 concluidos (97.3%)**
 - Nao funcional: **13/18 concluidos (72.2%)**
-- Geral do roadmap: **45/55 concluidos (81.8%)**
+- Geral do roadmap: **49/55 concluidos (89.1%)**
 
 Regra de atualizacao desta secao:
 - Ao marcar/desmarcar qualquer item nas fases, atualizar imediatamente os 3 percentuais acima.
@@ -258,6 +258,28 @@ Regra de atualizacao desta secao:
   - unitario do scheduler
   - integracao do fluxo de execucao + auditoria
   - repositorio com queries de suporte ao bonus
+
+### 4.19 Entrega concluida
+- [x] Evolucao de metas com progresso por saldo implementada para consumo de telas.
+- [x] Endpoints de consulta por perfil implementados:
+  - `GET /api/v1/accounts/{accountId}/child-view`
+  - `GET /api/v1/accounts/{accountId}/parent-view`
+- [x] Contrato de resposta da visao da crianca entregue com:
+  - saldo atual
+  - metas com progresso (`progressAmount`, `progressPercent`, `remainingAmount`, `achieved`)
+  - historico simplificado de transacoes recentes
+- [x] Contrato de resposta da visao dos pais entregue com:
+  - saldo atual
+  - resumo mensal por tipo e origem
+  - regra de bonus atual (quando existente)
+  - metas com progresso
+  - historico detalhado de transacoes recentes
+- [x] Testes automatizados da entrega:
+  - unitarios do servico de visao da conta (calculo de progresso e composicao)
+  - testes de controller do novo contrato HTTP
+  - integracao HTTP cobrindo `200`, `401` e `403`
+- [x] Validacao local da entrega:
+  - `./mvnw verify` com sucesso
 - [x] Validacao local da entrega:
   - `./mvnw verify` com sucesso.
 
@@ -334,12 +356,12 @@ Objetivo: habilitar recursos educacionais previstos no produto.
 
 - [x] Regras de bonus configuraveis por conta (consulta/upsert da regra por conta).
 - [x] Execucao de bonus (job/agendamento) com trilha auditavel.
-- [ ] Evolucao de metas com progresso por saldo.
-- [ ] Endpoints de consulta para tela crianca e pais.
-- [ ] Testes automatizados obrigatorios:
+- [x] Evolucao de metas com progresso por saldo.
+- [x] Endpoints de consulta para tela crianca e pais.
+- [x] Testes automatizados obrigatorios:
   - [x] unitarios das regras de bonus e agendamento
-  - integracao de metas e progresso
-- [ ] Cobertura alvo da fase: minimo 80% dos modulos de bonus/metas.
+  - [x] integracao de metas e progresso
+- [x] Cobertura alvo da fase: minimo 80% dos modulos de bonus/metas.
 
 ### 5.2 Atividades nao funcionais (qualidade, seguranca, operacao e entrega)
 
@@ -402,7 +424,8 @@ Um item so pode ser marcado como concluido quando:
 
 ## 7) Proxima entrega recomendada (curto prazo)
 - [ ] Prioridade funcional:
-  - evoluir metas com progresso por saldo (modelo + servico + endpoint de consulta)
-  - incluir testes de integracao de metas/progresso para fechar pendencia da fase 6
+  - avaliar necessidade de seeds opcionais para ambiente de desenvolvimento (fase 1 pendente)
 - [ ] Prioridade nao funcional:
   - health/readiness/liveness para operacao local e futura producao
+  - logs estruturados e rastreabilidade de erro
+  - metricas essenciais e documentacao de deploy/rollback de banco

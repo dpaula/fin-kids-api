@@ -35,6 +35,8 @@ class OpenApiDocumentationIntegrationTest {
                 .andExpect(jsonPath("$.paths['/api/v1/automation/transactions'].post.responses['409']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/accounts/{accountId}/balance']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/accounts/{accountId}/monthly-summary']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/accounts/{accountId}/child-view']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/accounts/{accountId}/parent-view']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/goals']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/accounts/{accountId}/bonus-rule']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/accounts/{accountId}/user-links']").exists())
